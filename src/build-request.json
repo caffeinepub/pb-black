@@ -1,0 +1,58 @@
+{
+  "kind": "build_request",
+  "title": "Fix deployment failure by resolving Motoko compilation issues and restoring successful deploy",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-17",
+      "text": "Fix backend Motoko compilation errors in backend/main.mo that can cause deployment to fail, including: (1) ensure the InviteRequest.compareByTimestamp function typechecks and actually returns an Order.Order; (2) add any missing imports used in backend/main.mo (e.g., Nat if Nat.compare is used); and (3) replace any invalid array-sorting usage (e.g., calling .sort on a Motoko array value) with a type-correct approach so getAllInviteRequests returns a sorted [InviteRequest] without compilation errors.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Pls try to sort that out"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The backend canister compiles without errors.",
+        "The getAllInviteRequests query returns a stable, correctly sorted [InviteRequest] (most-recent-first or requestId order is acceptable as long as it is deterministic and documented in code)."
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-2",
+          "msg-3"
+        ],
+        "quotes": [
+          "🙏 We hit a snag during deployment",
+          "Deployment error",
+          "Pls try to sort that out"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A clean build and deploy completes successfully (backend + frontend).",
+        "The frontend compiles successfully with TypeScript and can call the backend methods used in frontend/src/hooks/useQueries.ts (e.g., submitInviteRequest, checkInviteStatus, getAllInviteRequests, getAllManagers, approveInvite, rejectInvite, addManager, removeManager)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor in backend/main.mo; introduce backend/migration.mo only if an actual stable-state upgrade is required.",
+    "Do not edit any files under frontend/src/components/ui or any other immutable paths listed in SYSTEM_CONTEXT.",
+    "Use English for all user-facing text."
+  ],
+  "nonGoals": [
+    "Adding new product features or changing existing UX flows.",
+    "Introducing new backend services, external databases, or third-party integrations."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

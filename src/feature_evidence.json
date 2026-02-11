@@ -1,0 +1,23 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-restore-successful-full-deployment-by-re-running-the-standard-deploy-flow-after-the-backend-fixes-and-ensure-the-frontend-type-bindings-remain-compatible-with-the-backend-candid-interface-regenerate-update-frontend-declarations-types-if-required-by-the-build-system-so-the-application-builds-and-deploys-end-to-end-without-errors",
+      "featureTitle": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+      "files": [],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "invite-links@3.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

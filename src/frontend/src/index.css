@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.25rem;
+        /* Black background with gold accents */
+        --background: 0.15 0 0;
+        --foreground: 0.95 0 0;
+        --card: 0.18 0 0;
+        --card-foreground: 0.95 0 0;
+        --popover: 0.18 0 0;
+        --popover-foreground: 0.95 0 0;
+        /* Gold primary color */
+        --primary: 0.75 0.15 85;
+        --primary-foreground: 0.15 0 0;
+        --secondary: 0.25 0 0;
+        --secondary-foreground: 0.95 0 0;
+        --muted: 0.25 0 0;
+        --muted-foreground: 0.65 0 0;
+        --accent: 0.75 0.15 85;
+        --accent-foreground: 0.15 0 0;
+        --destructive: 0.55 0.25 25;
+        --destructive-foreground: 0.95 0 0;
+        --border: 0.30 0.08 85 / 30%;
+        --input: 0.30 0.08 85 / 30%;
+        --ring: 0.75 0.15 85;
+        --chart-1: 0.75 0.15 85;
+        --chart-2: 0.65 0.12 75;
+        --chart-3: 0.55 0.10 65;
+        --chart-4: 0.45 0.08 55;
+        --chart-5: 0.35 0.06 45;
+    }
+
+    .dark {
+        --background: 0.10 0 0;
+        --foreground: 0.95 0 0;
+        --card: 0.15 0 0;
+        --card-foreground: 0.95 0 0;
+        --popover: 0.15 0 0;
+        --popover-foreground: 0.95 0 0;
+        --primary: 0.75 0.15 85;
+        --primary-foreground: 0.10 0 0;
+        --secondary: 0.20 0 0;
+        --secondary-foreground: 0.95 0 0;
+        --muted: 0.20 0 0;
+        --muted-foreground: 0.60 0 0;
+        --accent: 0.75 0.15 85;
+        --accent-foreground: 0.10 0 0;
+        --destructive: 0.55 0.25 25;
+        --destructive-foreground: 0.95 0 0;
+        --border: 0.30 0.08 85 / 25%;
+        --input: 0.30 0.08 85 / 25%;
+        --ring: 0.75 0.15 85;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+@layer components {
+    .gold-gradient {
+        background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.65 0.12 75) 100%);
+    }
+    
+    .gold-text {
+        background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.65 0.12 75) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+}

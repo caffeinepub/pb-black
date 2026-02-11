@@ -1,0 +1,23 @@
+{
+  "frontend/src/index.css": "Global styles with black-and-gold OKLCH color system, premium design tokens, and custom utility classes for gold gradients and text effects.",
+  "frontend/tailwind.config.js": "Tailwind configuration extended with gold color palette, premium shadows, serif fonts (Playfair Display), and custom animations for the PB Black brand.",
+  "frontend/src/App.tsx": "Main app component with path-based routing for landing page (/), admin page (/admin), and member dashboard page (/member).",
+  "frontend/src/pages/PBBlackLandingPage.tsx": "Complete landing page with hero, target audience, why PB Black, core offering, claims service sections, invite request form, status checker, and footer with attribution.",
+  "frontend/src/pages/AdminPage.tsx": "Admin dashboard with Internet Identity authentication, role-based access control, and tabs for managing invite requests and managers roster.",
+  "frontend/src/components/pbblack/PremiumButton.tsx": "Reusable gold gradient button component that properly extends the shadcn Button component props for CTAs throughout the application.",
+  "frontend/src/components/pbblack/ComparisonCards.tsx": "Component displaying the three problems with traditional wealth managers in card format.",
+  "frontend/src/components/pbblack/PremiumDivider.tsx": "Subtle gold gradient horizontal divider for section separation.",
+  "frontend/src/components/pbblack/Disclaimer.tsx": "Reusable disclaimer component with invite-only and non-guarantee messaging.",
+  "frontend/src/components/pbblack/InviteRequestForm.tsx": "Form for submitting invitation requests with validation, success state, and backend integration.",
+  "frontend/src/components/pbblack/InviteStatusChecker.tsx": "Public status checker with navigation button to member dashboard when invite status is approved.",
+  "frontend/src/components/auth/LoginButton.tsx": "Internet Identity login/logout button with loading states and query cache clearing.",
+  "frontend/src/components/admin/InviteRequestsTable.tsx": "Admin table for viewing, filtering, approving, and rejecting invite requests.",
+  "frontend/src/components/admin/ManagersRoster.tsx": "Admin interface for managing the concierge manager roster with add/remove functionality.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including invite requests, managers, status checks, and mutations.",
+  "frontend/src/lib/validators.ts": "Client-side validation functions for email, phone, and LinkedIn profile inputs.",
+  "frontend/src/pages/MemberDashboardPage.tsx": "Premium member dashboard page displaying assigned manager (Udit Matta) with contact details, WhatsApp link, photo, and policies section with callback/meeting scheduling flows.",
+  "frontend/src/components/pbblack/PoliciesSection.tsx": "Component displaying three example policies (Health, Term, Motor) with detailed information and action buttons for connecting to manager, requesting callbacks, and scheduling meetings.",
+  "frontend/src/components/pbblack/CallbackRequestFlow.tsx": "Modal dialog flow for requesting a callback with time window selection, optional notes, and client-side confirmation display.",
+  "frontend/src/components/pbblack/MeetingSchedulerFlow.tsx": "Modal dialog flow for scheduling meetings with in-person/video options, date/time selection, optional agenda notes, and client-side confirmation summary.",
+  "frontend/src/hooks/useActor.ts": "Hook for initializing and managing the backend actor with Internet Identity authentication, handling both authenticated and anonymous actors with automatic query invalidation on identity changes."
+}

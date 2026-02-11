@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 9,
+  "summary": "Build PB Black: an invite-only, premium insurance concierge landing page (black & gold) where users request an invitation via LinkedIn and are enrolled and assigned a dedicated insurance manager.",
+  "architectural_notes": [
+    "Use a black & gold premium visual theme consistent across landing and apply flow.",
+    "Plan for LinkedIn OAuth / LinkedIn profile data capture as the primary identity source for applications.",
+    "Model post-application states (requested → approved/denied → enrolled) and manager assignment.",
+    "Add a post-enrollment member dashboard page that surfaces assigned manager contact (including WhatsApp deep link) and a simple policies dashboard with actions (connect/request callback/schedule in-person or video meeting).",
+    "Include a landing-page section that frames PB Black value by listing key current insurance ecosystem pain points (multiple PoCs, outdated policies/offerings, lack of claims-time assistance, lack of renewal/update concierge)."
+  ],
+  "known_issues": [
+    "Deployment/build failed during deployment attempt (deployment error encountered while packaging/pushing code)."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-a-pb-black-landing-page-that-presents-the-provided-positioning-and-sections-in-english-including-hero-pb-black-insurance-managed-like-premium-private-banking-invite-only-insurance-concierge-for-india-s-select-families-this-is-not-open-for-everyone-cta-apply-for-pb-black-target-audience-list-why-pb-black-comparison-bullets-core-offering-bullets-including-insurance-categories-and-a-moment-of-truth-claims-story-section-with-the-provided-service-bullets-180-city-support-24-7-assistance-600-claim-assistants",
+      "title": "Create a PB Black landing page that presents the provided positioning and sections in English, including: hero (\"PB Black\", \"Insurance. Managed Like Premium Private Banking.\", \"Invite-only insurance concierge for India’s select families.\", \"This is not open for everyone.\", CTA \"Apply for PB Black\"), \"Target audience\" list, \"Why PB Black\" comparison bullets, \"Core Offering\" bullets (including insurance categories), and a \"Moment of Truth (Claims story)\" section with the provided service bullets (180-city support, 24×7 assistance, 600+ claim assistants).",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-cohesive-premium-visual-theme-using-black-and-gold-no-blue-purple-across-the-landing-page-typography-spacing-buttons-cards-dividers-with-consistent-styling-and-a-distinct-private-banking-feel",
+      "title": "Apply a cohesive premium visual theme using black and gold (no blue/purple) across the landing page (typography, spacing, buttons, cards, dividers), with consistent styling and a distinct \"private banking\" feel.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-invite-request-form-request-an-invitation-that-captures-a-user-s-linkedin-identity-as-entered-data-linkedin-profile-url-and-or-linkedin-handle-plus-basic-contact-fields-needed-to-follow-up-full-name-email-phone-make-clear-in-the-ui-that-this-is-an-invite-request-not-immediate-access",
+      "title": "Implement an invite request form (\"Request an invitation\") that captures a user's LinkedIn identity as entered data (LinkedIn profile URL and/or LinkedIn handle), plus basic contact fields needed to follow up (full name, email, phone). Make clear in the UI that this is an invite request (not immediate access).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-simple-admin-interface-to-review-invitation-requests-manage-the-manager-roster-and-approve-reject-requests-protect-admin-actions-using-internet-identity-login-admin-only-access",
+      "title": "Create a simple admin interface to review invitation requests, manage the manager roster, and approve/reject requests. Protect admin actions using Internet Identity login (admin-only access).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-public-check-invitation-status-section-where-applicants-can-enter-their-email-to-see-whether-their-request-is-pending-approved-rejected-and-if-approved-display-the-assigned-manager-s-name-and-optional-contact-info-if-provided",
+      "title": "Add a public \"Check invitation status\" section where applicants can enter their email to see whether their request is Pending/Approved/Rejected, and if Approved, display the assigned manager’s name (and optional contact info if provided).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-product-safe-copy-safeguards-and-disclaimers-on-the-landing-page-indicating-that-pb-black-is-invite-only-and-that-submitting-a-request-does-not-guarantee-acceptance-avoid-making-guarantees-about-underwriting-claims-outcomes",
+      "title": "Add basic product-safe copy safeguards and disclaimers on the landing page indicating that PB Black is invite-only and that submitting a request does not guarantee acceptance; avoid making guarantees about underwriting/claims outcomes.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-premium-brand-static-images-for-the-landing-page-served-from-frontend-public-assets-generated-and-integrate-them-into-the-ui-without-routing-images-through-the-backend",
+      "title": "Generate and include premium brand static images for the landing page (served from frontend/public/assets/generated) and integrate them into the UI without routing images through the backend.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-onboarded-member-page-member-dashboard-reachable-via-a-dedicated-route-e-g-member-or-dashboard-that-matches-the-existing-pb-black-black-and-gold-premium-theme-and-clearly-indicates-it-is-for-onboarded-pb-black-customers",
+      "title": "Add a new onboarded-member page (member dashboard) reachable via a dedicated route (e.g., \"/member\" or \"/dashboard\") that matches the existing PB Black black-and-gold premium theme and clearly indicates it is for onboarded PB Black customers.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-member-dashboard-page-render-an-assigned-manager-section-showing-a-manager-profile-with-name-udit-matta-an-email-address-phone-contact-details-and-a-whatsapp-contact-option-a-clickable-link-include-a-manager-photo-using-a-generated-static-image-asset",
+      "title": "On the member dashboard page, render an \"Assigned Manager\" section showing a manager profile with: name \"Udit Matta\", an email address, phone/contact details, and a WhatsApp contact option (a clickable link). Include a manager photo using a generated static image asset.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-policies-dashboard-section-listing-example-policies-for-health-term-and-motor-insurance-each-showing-basic-details-e-g-insurer-policy-number-sum-insured-cover-amount-premium-renewal-date-status-in-a-clear-card-table-layout",
+      "title": "Add a \"Policies\" dashboard section listing example policies for Health, Term, and Motor insurance, each showing basic details (e.g., insurer, policy number, sum insured/cover amount, premium, renewal date, status) in a clear card/table layout.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-for-each-listed-policy-provide-actions-next-to-the-policy-to-1-connect-to-the-manager-2-request-a-callback-and-3-schedule-a-meeting",
+      "title": "For each listed policy, provide actions next to the policy to: (1) connect to the manager, (2) request a callback, and (3) schedule a meeting.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-meeting-scheduler-ui-on-the-member-dashboard-that-lets-the-user-choose-meeting-type-in-person-or-video-select-a-date-and-time-add-an-optional-note-and-confirm-the-meeting-request-keep-this-as-an-in-app-ui-workflow-no-external-calendar-integrations",
+      "title": "Implement a meeting scheduler UI on the member dashboard that lets the user choose meeting type (\"In-person\" or \"Video\"), select a date and time, add an optional note, and confirm the meeting request. Keep this as an in-app UI workflow (no external calendar integrations).",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-navigation-to-reach-the-new-member-dashboard-from-existing-ui-flows-without-requiring-manual-url-entry-e-g-a-button-link-shown-when-an-invitation-status-check-returns-approved-use-english-for-the-button-link-text",
+      "title": "Add navigation to reach the new member dashboard from existing UI flows without requiring manual URL entry (e.g., a button/link shown when an invitation status check returns Approved). Use English for the button/link text.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-section-on-the-pb-black-landing-page-the-first-page-that-clearly-outlines-the-current-issues-in-the-insurance-ecosystem-using-english-user-facing-text-the-section-must-include-the-following-points-multiple-points-of-contact-for-different-policies-outdated-policies-with-outdated-offerings-no-direct-assistance-at-the-time-of-claims-no-concierge-support-at-the-time-of-renewals-or-updates-the-section-must-match-the-existing-premium-black-and-gold-pb-black-theme-and-be-placed-as-a-first-page-section-i-e-visible-on-the-landing-page-without-needing-to-navigate-to-another-route",
+      "title": "Add a new section on the PB Black landing page (the first page) that clearly outlines the current issues in the insurance ecosystem, using English user-facing text. The section must include the following points:\n- Multiple points of contact for different policies\n- Outdated policies with outdated offerings\n- No direct assistance at the time of claims\n- No concierge support at the time of renewals or updates\nThe section must match the existing premium black-and-gold PB Black theme and be placed as a first-page section (i.e., visible on the landing page without needing to navigate to another route).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-restore-successful-full-deployment-by-re-running-the-standard-deploy-flow-after-the-backend-fixes-and-ensure-the-frontend-type-bindings-remain-compatible-with-the-backend-candid-interface-regenerate-update-frontend-declarations-types-if-required-by-the-build-system-so-the-application-builds-and-deploys-end-to-end-without-errors",
+      "title": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create PB Black black-and-gold landing page with premium positioning and copy (headline, target audience, why PB Black, core offering, claims concierge).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add invite-only 'Request an invitation / Apply for PB Black' lead capture flow.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement LinkedIn-based signup/identity capture for invitation requests.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Create enrollment workflow to onboard approved users into PB Black and assign a dedicated insurance manager (concierge services).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add backend persistence for invitation requests and implement an API for the frontend to submit new requests and to query request status by a user-provided lookup key (e.g., email). Store: requestId, timestamp, applicant name, email, phone, LinkedIn field, source/referral text, status (Pending/Approved/Rejected), and (when approved) assignedManagerId.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Implement a concierge manager assignment workflow: maintain a roster of managers (id, name, optional bio, optional contact info) and, when an invite request is approved, assign exactly one dedicated manager to that applicant (automatic assignment is acceptable, e.g., round-robin).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Create an onboarded PB Black member dashboard page showing the assigned manager profile (hardcode example: Udit Matta with email/contact + WhatsApp link) and a policies list (example health/term/motor with basic details) with per-policy actions to contact manager, request callback, and schedule meetings (in-person or video).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Add a new landing-page section outlining current issues in the insurance ecosystem (multiple points of contact across policies, outdated policies/offerings, no direct claims-time assistance, no concierge support at renewals/updates).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Fix backend Motoko compilation errors in backend/main.mo that can cause deployment to fail, including: (1) ensure the InviteRequest.compareByTimestamp function typechecks and actually returns an Order.Order; (2) add any missing imports used in backend/main.mo (e.g., Nat if Nat.compare is used); and (3) replace any invalid array-sorting usage (e.g., calling .sort on a Motoko array value) with a type-correct approach so getAllInviteRequests returns a sorted [InviteRequest] without compilation errors.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "PB Black",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

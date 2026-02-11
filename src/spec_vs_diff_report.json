@@ -1,0 +1,50 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-11T07:26:48.306Z",
+  "summary": "REQ-17 appears not fully implemented: the new InviteRequest.compareByTimestamp definition in backend/main.mo likely still does not typecheck because it discards the Order.Order result. The diff does show an added Nat import, but there’s no clear evidence (in the truncated diff) that getAllInviteRequests was fixed to use a type-correct, deterministic sorting approach. REQ-18 is not evidenced: no frontend candid/type declaration regeneration or compatibility updates are shown, only changes to summary/metadata files.",
+  "missing_requirements": [
+    {
+      "id": "REQ-17",
+      "requirement": "Ensure InviteRequest.compareByTimestamp typechecks and actually returns an Order.Order.",
+      "reason": "In backend/main.mo, compareByTimestamp calls Nat.compare(a.requestId, b.requestId); but ends the expression with a semicolon, which discards the value and would not satisfy the declared return type Order.Order.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "requirement": "Replace invalid array-sorting usage with a type-correct approach so getAllInviteRequests returns a deterministically sorted [InviteRequest] without compilation errors, and document the deterministic ordering.",
+      "reason": "The diff is truncated before any getAllInviteRequests implementation is shown, so there is no evidence that the array-sorting issue was addressed or that deterministic sorting is implemented/documented.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "requirement": "Ensure frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required) so the app builds and deploys end-to-end without errors.",
+      "reason": "No changes are shown to generated declarations/types (e.g., did declarations) or any frontend binding files; only backend/main.mo and two project metadata/summary files were modified.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "project_state.json",
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Updates to project/feature summary metadata unrelated to fixing Motoko compilation/deploy (e.g., extensive frontend feature/page descriptions and project state summary).",
+      "reason": "BuildRequest scope is to fix backend compilation and restore deploy; modifying frontend-file-summaries.txt and project_state.json appears unrelated to those requirements and may represent unrequested work.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "project_state.json"
+      ]
+    }
+  ],
+  "confidence": 0.66,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "project_state.json"
+  ]
+}
