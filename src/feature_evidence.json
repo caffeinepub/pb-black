@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-restore-successful-full-deployment-by-re-running-the-standard-deploy-flow-after-the-backend-fixes-and-ensure-the-frontend-type-bindings-remain-compatible-with-the-backend-candid-interface-regenerate-update-frontend-declarations-types-if-required-by-the-build-system-so-the-application-builds-and-deploys-end-to-end-without-errors",
-      "featureTitle": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+      "featureId": "feature-re-run-the-standard-end-to-end-deploy-flow-so-the-application-is-live-ensuring-the-frontend-type-bindings-remain-compatible-with-the-backend-candid-interface-regenerate-update-frontend-declarations-if-required-by-the-build-system",
+      "featureTitle": "Re-run the standard end-to-end deploy flow so the application is live, ensuring the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations if required by the build system).",
       "files": [],
       "components": [
         "authorization@4.0.0",
@@ -15,7 +15,7 @@
         "invite-links@3.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-52"
       ],
       "confidence": "high"
     }

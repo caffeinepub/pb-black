@@ -8,25 +8,50 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const ManagerId = IDL.Nat;
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
+});
+export const Occupation = IDL.Variant({
+  'ceoOrExecutive' : IDL.Null,
+  'entrepreneurBusinessOwner' : IDL.Null,
+  'partnerOrDirector' : IDL.Null,
+  'lawProfessional' : IDL.Null,
+  'medicalProfessional' : IDL.Null,
+  'notListed' : IDL.Null,
+  'pilot' : IDL.Null,
+  'corporateProfessional' : IDL.Null,
 });
 export const InviteStatus = IDL.Variant({
   'pending' : IDL.Null,
   'approved' : IDL.Null,
   'rejected' : IDL.Null,
 });
-export const InviteRequest = IDL.Record({
+export const PreferredCallTime = IDL.Variant({
+  'morning' : IDL.Null,
+  'evening' : IDL.Null,
+  'afternoon' : IDL.Null,
+});
+export const PremiumIncomeRange = IDL.Variant({
+  'range50kTo75k' : IDL.Null,
+  'range25kTo50k' : IDL.Null,
+  'range75kTo100k' : IDL.Null,
+  'range100kPlus' : IDL.Null,
+});
+export const PremiumQualification = IDL.Record({
+  'id' : IDL.Nat,
+  'occupation' : Occupation,
   'status' : InviteStatus,
   'linkedin' : IDL.Text,
-  'requestId' : IDL.Nat,
-  'source' : IDL.Text,
+  'preferredCallTime' : PreferredCallTime,
+  'annualPremiumRange' : PremiumIncomeRange,
   'name' : IDL.Text,
   'email' : IDL.Text,
-  'assignedManagerId' : IDL.Opt(IDL.Nat),
+  'referredBy' : IDL.Opt(IDL.Text),
   'timestamp' : IDL.Int,
+  'totalHealthCover' : IDL.Opt(IDL.Nat),
   'phone' : IDL.Text,
 });
 export const Manager = IDL.Record({
@@ -42,65 +67,119 @@ export const RSVP = IDL.Record({
   'timestamp' : Time,
   'attending' : IDL.Bool,
 });
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Opt(IDL.Text),
+});
 export const InviteCode = IDL.Record({
   'created' : Time,
   'code' : IDL.Text,
   'used' : IDL.Bool,
 });
+export const PremiumQualificationId = IDL.Nat;
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addManager' : IDL.Func(
       [IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
-      [IDL.Nat],
+      [ManagerId],
       [],
     ),
-  'approveInvite' : IDL.Func([IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'checkInviteStatus' : IDL.Func(
+  'checkQualificationStatus' : IDL.Func(
       [IDL.Text],
-      [IDL.Opt(InviteRequest)],
+      [IDL.Opt(PremiumQualification)],
       ['query'],
     ),
   'generateInviteCode' : IDL.Func([], [IDL.Text], []),
-  'getAllInviteRequests' : IDL.Func([], [IDL.Vec(InviteRequest)], ['query']),
   'getAllManagers' : IDL.Func([], [IDL.Vec(Manager)], ['query']),
+  'getAllQualifications' : IDL.Func(
+      [],
+      [IDL.Vec(PremiumQualification)],
+      ['query'],
+    ),
   'getAllRSVPs' : IDL.Func([], [IDL.Vec(RSVP)], ['query']),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getInviteCodes' : IDL.Func([], [IDL.Vec(InviteCode)], ['query']),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'rejectInvite' : IDL.Func([IDL.Nat], [], []),
-  'removeManager' : IDL.Func([IDL.Nat], [], []),
-  'submitInviteRequest' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
-      [IDL.Nat],
+  'removeManager' : IDL.Func([ManagerId], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'submitQualification' : IDL.Func(
+      [
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Text,
+        IDL.Opt(IDL.Text),
+        IDL.Opt(IDL.Nat),
+        PremiumIncomeRange,
+        Occupation,
+        PreferredCallTime,
+      ],
+      [PremiumQualificationId],
       [],
     ),
   'submitRSVP' : IDL.Func([IDL.Text, IDL.Bool, IDL.Text], [], []),
+  'updateQualificationStatus' : IDL.Func(
+      [PremiumQualificationId, InviteStatus],
+      [],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const ManagerId = IDL.Nat;
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const Occupation = IDL.Variant({
+    'ceoOrExecutive' : IDL.Null,
+    'entrepreneurBusinessOwner' : IDL.Null,
+    'partnerOrDirector' : IDL.Null,
+    'lawProfessional' : IDL.Null,
+    'medicalProfessional' : IDL.Null,
+    'notListed' : IDL.Null,
+    'pilot' : IDL.Null,
+    'corporateProfessional' : IDL.Null,
   });
   const InviteStatus = IDL.Variant({
     'pending' : IDL.Null,
     'approved' : IDL.Null,
     'rejected' : IDL.Null,
   });
-  const InviteRequest = IDL.Record({
+  const PreferredCallTime = IDL.Variant({
+    'morning' : IDL.Null,
+    'evening' : IDL.Null,
+    'afternoon' : IDL.Null,
+  });
+  const PremiumIncomeRange = IDL.Variant({
+    'range50kTo75k' : IDL.Null,
+    'range25kTo50k' : IDL.Null,
+    'range75kTo100k' : IDL.Null,
+    'range100kPlus' : IDL.Null,
+  });
+  const PremiumQualification = IDL.Record({
+    'id' : IDL.Nat,
+    'occupation' : Occupation,
     'status' : InviteStatus,
     'linkedin' : IDL.Text,
-    'requestId' : IDL.Nat,
-    'source' : IDL.Text,
+    'preferredCallTime' : PreferredCallTime,
+    'annualPremiumRange' : PremiumIncomeRange,
     'name' : IDL.Text,
     'email' : IDL.Text,
-    'assignedManagerId' : IDL.Opt(IDL.Nat),
+    'referredBy' : IDL.Opt(IDL.Text),
     'timestamp' : IDL.Int,
+    'totalHealthCover' : IDL.Opt(IDL.Nat),
     'phone' : IDL.Text,
   });
   const Manager = IDL.Record({
@@ -116,41 +195,70 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : Time,
     'attending' : IDL.Bool,
   });
+  const UserProfile = IDL.Record({
+    'name' : IDL.Text,
+    'email' : IDL.Opt(IDL.Text),
+  });
   const InviteCode = IDL.Record({
     'created' : Time,
     'code' : IDL.Text,
     'used' : IDL.Bool,
   });
+  const PremiumQualificationId = IDL.Nat;
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addManager' : IDL.Func(
         [IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
-        [IDL.Nat],
+        [ManagerId],
         [],
       ),
-    'approveInvite' : IDL.Func([IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'checkInviteStatus' : IDL.Func(
+    'checkQualificationStatus' : IDL.Func(
         [IDL.Text],
-        [IDL.Opt(InviteRequest)],
+        [IDL.Opt(PremiumQualification)],
         ['query'],
       ),
     'generateInviteCode' : IDL.Func([], [IDL.Text], []),
-    'getAllInviteRequests' : IDL.Func([], [IDL.Vec(InviteRequest)], ['query']),
     'getAllManagers' : IDL.Func([], [IDL.Vec(Manager)], ['query']),
+    'getAllQualifications' : IDL.Func(
+        [],
+        [IDL.Vec(PremiumQualification)],
+        ['query'],
+      ),
     'getAllRSVPs' : IDL.Func([], [IDL.Vec(RSVP)], ['query']),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getInviteCodes' : IDL.Func([], [IDL.Vec(InviteCode)], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'rejectInvite' : IDL.Func([IDL.Nat], [], []),
-    'removeManager' : IDL.Func([IDL.Nat], [], []),
-    'submitInviteRequest' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
-        [IDL.Nat],
+    'removeManager' : IDL.Func([ManagerId], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'submitQualification' : IDL.Func(
+        [
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Text,
+          IDL.Opt(IDL.Text),
+          IDL.Opt(IDL.Nat),
+          PremiumIncomeRange,
+          Occupation,
+          PreferredCallTime,
+        ],
+        [PremiumQualificationId],
         [],
       ),
     'submitRSVP' : IDL.Func([IDL.Text, IDL.Bool, IDL.Text], [], []),
+    'updateQualificationStatus' : IDL.Func(
+        [PremiumQualificationId, InviteStatus],
+        [],
+        [],
+      ),
   });
 };
 

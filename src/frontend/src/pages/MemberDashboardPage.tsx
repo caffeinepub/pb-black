@@ -1,33 +1,23 @@
 import { useState } from 'react';
-import { Phone, Mail, MessageCircle, ArrowLeft } from 'lucide-react';
-import PremiumButton from '../components/pbblack/PremiumButton';
-import PremiumDivider from '../components/pbblack/PremiumDivider';
+import { ArrowLeft } from 'lucide-react';
+import PortfolioHealthTopSection from '../components/pbblack/PortfolioHealthTopSection';
+import PBBlackInsightsSection from '../components/pbblack/PBBlackInsightsSection';
+import CoverageGapAnalysisSection from '../components/pbblack/CoverageGapAnalysisSection';
+import ClaimsReadinessStatusSection from '../components/pbblack/ClaimsReadinessStatusSection';
+import UpcomingActionsSection from '../components/pbblack/UpcomingActionsSection';
 import PoliciesSection from '../components/pbblack/PoliciesSection';
+import ContactMyManagerDialog from '../components/pbblack/ContactMyManagerDialog';
+import PBBlackPrivilegesBlock from '../components/pbblack/PBBlackPrivilegesBlock';
 import CallbackRequestFlow from '../components/pbblack/CallbackRequestFlow';
 import MeetingSchedulerFlow from '../components/pbblack/MeetingSchedulerFlow';
 
 export default function MemberDashboardPage() {
   const [showCallbackFlow, setShowCallbackFlow] = useState(false);
   const [showMeetingScheduler, setShowMeetingScheduler] = useState(false);
-  const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
 
   const handleBackToHome = () => {
     window.history.pushState({}, '', '/');
     window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
-  const handleConnectManager = () => {
-    // Opens contact options
-  };
-
-  const handleRequestCallback = (policyType: string) => {
-    setSelectedPolicy(policyType);
-    setShowCallbackFlow(true);
-  };
-
-  const handleScheduleMeeting = (policyType: string) => {
-    setSelectedPolicy(policyType);
-    setShowMeetingScheduler(true);
   };
 
   const managerDetails = {
@@ -56,156 +46,54 @@ export default function MemberDashboardPage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-12 max-w-7xl">
-        {/* Welcome Section */}
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold mb-4 gold-text">
-            Welcome to Your Dashboard
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Your premium insurance experience, managed with excellence
-          </p>
-        </div>
+      <main className="container mx-auto px-4 py-12 max-w-7xl space-y-12">
+        {/* Portfolio Health Top Section */}
+        <PortfolioHealthTopSection
+          managerName={managerDetails.name}
+          managerPhoto="/assets/generated/udit-matta-portrait.dim_512x512.png"
+          healthScore={82}
+        />
 
-        {/* Assigned Manager Section */}
-        <section className="mb-12">
-          <h3 className="text-2xl font-serif font-bold mb-6 gold-text">
-            Your Dedicated Manager
-          </h3>
-          <div className="bg-card border border-border rounded-lg p-8 shadow-gold">
-            <div className="grid md:grid-cols-[auto_1fr] gap-8 items-start">
-              {/* Manager Photo */}
-              <div className="flex justify-center md:justify-start">
-                <div className="relative">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gold/30 shadow-gold">
-                    <img
-                      src="/assets/generated/udit-matta-portrait.dim_512x512.png"
-                      alt={managerDetails.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gold rounded-full flex items-center justify-center shadow-lg">
-                    <MessageCircle className="w-5 h-5 text-black" />
-                  </div>
-                </div>
-              </div>
+        {/* PB Black Insights */}
+        <PBBlackInsightsSection />
 
-              {/* Manager Details */}
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-3xl font-serif font-bold mb-2 text-foreground">
-                    {managerDetails.name}
-                  </h4>
-                  <p className="text-gold font-medium">
-                    Senior Insurance Concierge
-                  </p>
-                </div>
+        {/* Coverage Gap Analysis */}
+        <CoverageGapAnalysisSection />
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {/* Email */}
-                  <a
-                    href={`mailto:${managerDetails.email}`}
-                    className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-colors">
-                      <Mail className="w-5 h-5 text-gold" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1">Email</p>
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {managerDetails.email}
-                      </p>
-                    </div>
-                  </a>
+        {/* Claims Readiness Status */}
+        <ClaimsReadinessStatusSection />
 
-                  {/* Phone */}
-                  <a
-                    href={`tel:${managerDetails.phone}`}
-                    className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-colors">
-                      <Phone className="w-5 h-5 text-gold" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1">Phone</p>
-                      <p className="text-sm font-medium text-foreground">
-                        {managerDetails.phone}
-                      </p>
-                    </div>
-                  </a>
-                </div>
-
-                {/* WhatsApp Button */}
-                <a
-                  href={`https://wa.me/${managerDetails.whatsapp}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block"
-                >
-                  <PremiumButton className="w-full sm:w-auto">
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Connect on WhatsApp
-                  </PremiumButton>
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <PremiumDivider />
+        {/* Upcoming Actions */}
+        <UpcomingActionsSection
+          onRequestCallback={() => setShowCallbackFlow(true)}
+          onScheduleMeeting={() => setShowMeetingScheduler(true)}
+        />
 
         {/* Policies Section */}
-        <section className="mb-12">
-          <h3 className="text-2xl font-serif font-bold mb-6 gold-text">
-            Your Policies
-          </h3>
-          <PoliciesSection
-            onConnectManager={handleConnectManager}
-            onRequestCallback={handleRequestCallback}
-            onScheduleMeeting={handleScheduleMeeting}
-            managerDetails={managerDetails}
-          />
-        </section>
-      </main>
+        <PoliciesSection />
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card/50 mt-20">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-sm text-muted-foreground">
-            <p>
-              © {new Date().getFullYear()} PB Black. Built with love using{' '}
-              <a
-                href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold hover:underline"
-              >
-                caffeine.ai
-              </a>
-            </p>
-          </div>
+        {/* PB Black Privileges */}
+        <PBBlackPrivilegesBlock />
+
+        {/* Contact My Manager - Single CTA */}
+        <div className="flex justify-center pt-8">
+          <ContactMyManagerDialog managerDetails={managerDetails} />
         </div>
-      </footer>
+      </main>
 
       {/* Callback Request Flow */}
       {showCallbackFlow && (
         <CallbackRequestFlow
-          policyType={selectedPolicy || ''}
-          onClose={() => {
-            setShowCallbackFlow(false);
-            setSelectedPolicy(null);
-          }}
+          policyType=""
+          onClose={() => setShowCallbackFlow(false)}
         />
       )}
 
       {/* Meeting Scheduler Flow */}
       {showMeetingScheduler && (
         <MeetingSchedulerFlow
-          policyType={selectedPolicy || ''}
-          onClose={() => {
-            setShowMeetingScheduler(false);
-            setSelectedPolicy(null);
-          }}
+          policyType=""
+          onClose={() => setShowMeetingScheduler(false)}
         />
       )}
     </div>

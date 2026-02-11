@@ -1,30 +1,27 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Restore successful deploy by aligning frontend type bindings with backend Candid interface",
+  "title": "Unblock frontend build for live deployment and ensure bindings match backend Candid",
   "requirements": [
     {
-      "id": "REQ-18",
-      "summary": "Ensure the frontend builds cleanly after backend fixes by updating/regenerating TypeScript bindings so hooks can call all required backend methods.",
+      "id": "REQ-52",
+      "summary": "Ensure the frontend builds cleanly against the deployed backend interface by aligning generated type bindings and actor initialization used for admin access.",
       "acceptanceCriteria": [
-        "A clean build and deploy completes successfully (backend + frontend).",
-        "The frontend compiles successfully with TypeScript and can call the backend methods used in frontend/src/hooks/useQueries.ts (e.g., submitInviteRequest, checkInviteStatus, getAllInviteRequests, getAllManagers, approveInvite, rejectInvite, addManager, removeManager)."
+        "Deployment completes without errors.",
+        "Landing page route `/` loads successfully in the deployed environment.",
+        "`/admin` route remains functional and still requires Internet Identity + admin authorization to access admin actions.",
+        "Frontend builds successfully against the deployed backend interface (no Candid/type mismatches)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/backend.d.ts",
           "operation": "modify",
-          "description": "Update the generated/declared backend type bindings to exactly match the backend Candid interface after the Motoko compilation fixes, ensuring all methods used by the app are present with correct parameter/return types (including any actor-initialization method invoked by the frontend such as _initializeAccessControlWithSecret if it exists in the generated actor)."
+          "description": "Update/regenerate the frontend backend type declarations to match the deployed backend Candid interface, ensuring any actor methods referenced by the frontend (including the access-control initialization used during actor creation) are represented so TypeScript builds without mismatches. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/hooks/useActor.ts",
           "operation": "modify",
-          "description": "Align actor initialization and typing with the updated backend bindings so TypeScript compiles cleanly (e.g., ensure any access-control initialization call is typed and compatible with the regenerated backend interface)."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Reconcile React Query hooks with the updated backend bindings (method names/signatures/types) so all required calls compile and remain functional without changing UX flows."
+          "description": "Adjust actor initialization typing so calling the access-control initialization method does not cause TypeScript errors (prefer aligning types via updated declarations; otherwise use a narrowly-scoped type refinement) while keeping the existing Internet Identity + admin gating behavior intact. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -1,16 +1,28 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "Build PB Black: an invite-only, premium insurance concierge landing page (black & gold) where users request an invitation via LinkedIn and are enrolled and assigned a dedicated insurance manager.",
+  "projectStateVersion": 23,
+  "summary": "Redesign PB Black landing page to feel ultra-premium, exclusive, private banking-grade for invite-only HNI insurance concierge in India (hero→eligibility→claims story→comparison→proof→qualification form→what happens next) with authoritative minimal tone + CTA, and redesign the onboarded member dashboard into a private-insurance command-center experience (advisory, intelligent, uncluttered, dark luxury with gold accents).",
   "architectural_notes": [
     "Use a black & gold premium visual theme consistent across landing and apply flow.",
     "Plan for LinkedIn OAuth / LinkedIn profile data capture as the primary identity source for applications.",
     "Model post-application states (requested → approved/denied → enrolled) and manager assignment.",
     "Add a post-enrollment member dashboard page that surfaces assigned manager contact (including WhatsApp deep link) and a simple policies dashboard with actions (connect/request callback/schedule in-person or video meeting).",
-    "Include a landing-page section that frames PB Black value by listing key current insurance ecosystem pain points (multiple PoCs, outdated policies/offerings, lack of claims-time assistance, lack of renewal/update concierge)."
+    "Include a landing-page section that frames PB Black value by listing key current insurance ecosystem pain points (multiple PoCs, outdated policies/offerings, lack of claims-time assistance, lack of renewal/update concierge).",
+    "Rename the landing-page section header from \"Current Issues in the Insurance Ecosystem\" to \"Insurance related challenges you must be facing today in your busy life\".",
+    "Adopt an authoritative, exclusive, minimal, confident (not salesy/discount-oriented) tone across the landing page; avoid long paragraphs; use short bold headings.",
+    "Landing page structure to follow: Hero (CTA “Check If You Qualify”) → Eligibility → Moment of Truth (claims) → Comparison table → Proof → Qualification form → What Happens Next; include scarcity messaging (limited quarterly onboarding).",
+    "Public-facing UI must not expose admin UI elements or non-PB branding (e.g., caffeine branding) on the landing page.",
+    "Member dashboard UX direction: advisory/command-center (not CRM-like/transactional); reduce button clutter; use collapsible policy cards with a single primary CTA; include sections for Insights, Coverage Gap Analysis, Claims Readiness, Upcoming Actions, and Privileges; maintain dark luxury theme with gold accents and ample whitespace."
   ],
   "known_issues": [
-    "Deployment/build failed during deployment attempt (deployment error encountered while packaging/pushing code)."
+    "Deployment/build failed during deployment attempt (deployment error encountered while packaging/pushing code).",
+    "The landing page is missing the requested \"current issues in the insurance ecosystem\" pointers on the first page/under \"Why PB Black\", and the \"Why PB Black\" section design is not satisfactory and needs redesign.",
+    "AI build failed to process the full landing-page redesign request in one step; may require breaking work into smaller deployable changes.",
+    "Landing page redesign appears incomplete; premium black-and-gold theme is not rendering correctly (colors not coming through as intended). Ensure gold and black are retained consistently across sections.",
+    "Landing page: PB logo in the top/header is being cut/clipped.",
+    "Landing page: hero headline typography is too large and copy needs to be more crisp and to the point.",
+    "Landing page: HNI Clients annual premium threshold is incorrect (shows INR 25,000+ instead of INR 100,000+).",
+    "Landing page: missing separate section focusing on comprehensive coverage by one insurance manager across all insurance types (previously present)."
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -133,6 +145,246 @@
         "REQ-18"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-on-the-pb-black-landing-page-route-ensure-the-first-page-content-clearly-includes-a-section-describing-the-current-issues-in-the-insurance-ecosystem-using-english-user-facing-text-and-including-all-of-the-following-points-verbatim-in-meaning-1-multiple-points-of-contact-for-different-policies-2-outdated-policies-with-outdated-offerings-3-no-direct-assistance-at-the-time-of-claims-4-no-concierge-support-at-the-time-of-renewals-or-updates-this-content-must-be-visible-on-the-landing-page-without-navigating-to-another-route",
+      "title": "On the PB Black landing page (route \"/\"), ensure the first-page content clearly includes a section describing the current issues in the insurance ecosystem, using English user-facing text and including all of the following points verbatim in meaning: (1) Multiple points of contact for different policies, (2) Outdated policies with outdated offerings, (3) No direct assistance at the time of claims, (4) No concierge support at the time of renewals or updates. This content must be visible on the landing page without navigating to another route.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-why-pb-black-section-styling-and-layout-so-it-looks-polished-and-consistent-with-the-premium-black-and-gold-theme-update-the-current-comparison-problem-cards-presentation-so-it-no-longer-looks-like-an-error-destructive-state-and-incorporate-the-ecosystem-issues-pointers-from-req-19-within-or-directly-adjacent-to-the-why-pb-black-section-in-a-cohesive-layout",
+      "title": "Redesign the “Why PB Black” section styling and layout so it looks polished and consistent with the premium black-and-gold theme. Update the current comparison/problem cards presentation so it no longer looks like an error/destructive state, and incorporate the ecosystem-issues pointers from REQ-19 within or directly adjacent to the “Why PB Black” section in a cohesive layout.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-landing-page-ecosystem-issues-section-header-text-from-current-issues-in-the-insurance-ecosystem-to-insurance-related-challenges-you-must-be-facing-today-in-your-busy-life-english-user-facing-keeping-existing-styling-and-layout-unchanged",
+      "title": "Update the landing-page ecosystem issues section header text from \"Current Issues in the Insurance Ecosystem\" to \"Insurance related challenges you must be facing today in your busy life\" (English, user-facing), keeping existing styling and layout unchanged.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-pb-black-landing-page-route-to-feel-ultra-premium-exclusive-and-private-banking-grade-with-an-authoritative-minimal-confident-tone-not-salesy-discount-oriented-and-short-bold-headings-avoid-long-paragraphs",
+      "title": "Redesign the PB Black landing page (route \"/\") to feel ultra-premium, exclusive, and private banking-grade, with an authoritative, minimal, confident tone (not salesy/discount-oriented) and short bold headings (avoid long paragraphs).",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-landing-page-information-architecture-to-match-this-section-order-1-hero-2-eligibility-immediately-below-hero-3-moment-of-truth-claims-4-comparison-table-pb-black-vs-traditional-advisors-5-proof-6-premium-qualification-form-7-what-happens-next-3-step-process-while-keeping-the-existing-invite-only-framing-and-disclaimer-safeguards",
+      "title": "Update the landing page information architecture to match this section order: (1) Hero, (2) Eligibility (immediately below hero), (3) Moment of Truth (claims), (4) Comparison table (PB Black vs Traditional Advisors), (5) Proof, (6) Premium qualification form, (7) “What Happens Next” 3-step process, while keeping the existing invite-only framing and disclaimer safeguards.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-revise-the-hero-section-copy-and-cta-to-match-the-new-positioning-an-emotionally-powerful-headline-a-clear-subheading-that-explicitly-mentions-dedicated-insurance-manager-24-7-claims-support-and-180-city-presence-and-set-the-primary-cta-button-text-to-exactly-check-if-you-qualify",
+      "title": "Revise the Hero section copy and CTA to match the new positioning: an emotionally powerful headline, a clear subheading that explicitly mentions “Dedicated Insurance Manager”, “24×7 Claims Support”, and “180 city presence”, and set the primary CTA button text to exactly “Check If You Qualify”.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-eligibility-section-directly-below-the-hero-section-that-explains-who-pb-black-is-for-hni-focused-india-and-includes-scarcity-messaging-that-quarterly-onboarding-is-limited",
+      "title": "Add an Eligibility section directly below the Hero section that explains who PB Black is for (HNI-focused, India) and includes scarcity messaging that quarterly onboarding is limited.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-comparison-table-section-that-compares-pb-black-vs-traditional-advisors-in-a-clear-table-layout-consistent-with-the-premium-theme-not-error-destructive-styling",
+      "title": "Add a Comparison Table section that compares “PB Black” vs “Traditional Advisors” in a clear table layout consistent with the premium theme (not error/destructive styling).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-proof-section-that-highlights-the-following-proof-points-in-a-strong-minimal-layout-600-claim-assistants-180-cities-and-largest-insurance-seller-positioning-while-keeping-product-safe-wording-and-avoiding-guarantees-about-outcomes",
+      "title": "Add a Proof section that highlights the following proof points in a strong, minimal layout: “600+ claim assistants”, “180 cities”, and “Largest insurance seller positioning”, while keeping product-safe wording and avoiding guarantees about outcomes.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-upgrade-the-current-invite-request-form-on-the-landing-page-into-a-premium-qualification-form-that-captures-the-existing-fields-plus-the-additional-fields-total-health-cover-annual-premium-range-occupation-and-preferred-time-to-connect",
+      "title": "Replace/upgrade the current invite request form on the landing page into a “premium qualification form” that captures the existing fields plus the additional fields: total health cover, annual premium range, occupation, and preferred time to connect.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-public-facing-admin-navigation-and-all-caffeine-branding-from-the-pb-black-landing-page-ui-while-keeping-the-admin-route-functional-and-accessible-only-via-direct-navigation-and-its-existing-authentication-authorization-checks",
+      "title": "Remove public-facing “Admin” navigation and all caffeine branding from the PB Black landing page UI, while keeping the /admin route functional and accessible only via direct navigation and its existing authentication/authorization checks.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-what-happens-next-section-on-the-landing-page-that-presents-a-clear-3-step-process-after-submitting-the-qualification-form-consistent-with-the-exclusive-invite-only-positioning",
+      "title": "Add a “What Happens Next” section on the landing page that presents a clear 3-step process after submitting the qualification form, consistent with the exclusive/invite-only positioning.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-global-theme-color-token-wiring-so-tailwind-color-utilities-bg-background-text-foreground-bg-card-border-border-text-muted-foreground-etc-render-with-the-intended-pb-black-premium-black-and-gold-palette-across-the-landing-page-and-related-pb-black-pages",
+      "title": "Fix the global theme color token wiring so Tailwind color utilities (bg-background, text-foreground, bg-card, border-border, text-muted-foreground, etc.) render with the intended PB Black premium black-and-gold palette across the landing page and related PB Black pages.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-or-neutralize-any-conflicting-global-css-variable-definitions-so-there-is-a-single-source-of-truth-for-theme-variables-used-by-tailwind-avoid-mixed-color-spaces-like-defining-variables-as-full-oklch-strings-while-tailwind-consumes-them-via-hsl-var-update-the-css-variable-definitions-and-or-tailwind-color-mapping-to-be-type-compatible-and-consistent",
+      "title": "Remove or neutralize any conflicting global CSS variable definitions so there is a single source of truth for theme variables used by Tailwind (avoid mixed color spaces like defining variables as full `oklch(...)` strings while Tailwind consumes them via `hsl(var(--...))`). Update the CSS variable definitions and/or Tailwind color mapping to be type-compatible and consistent.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-member-dashboard-page-member-file-frontend-src-pages-memberdashboardpage-tsx-to-feel-like-a-private-insurance-command-center-for-hni-clients-with-an-authoritative-calm-assured-tone-english-using-a-dark-luxury-theme-with-gold-accents-large-whitespace-and-minimal-icon-usage",
+      "title": "Redesign the Member Dashboard page (/member, file: frontend/src/pages/MemberDashboardPage.tsx) to feel like a private insurance command center for HNI clients with an authoritative, calm, assured tone (English), using a dark luxury theme with gold accents, large whitespace, and minimal icon usage.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-the-new-top-section-on-the-member-dashboard-with-1-concierge-name-and-photo-2-a-portfolio-health-score-display-e-g-82-100-and-3-the-short-summary-text-exactly-your-portfolio-is-strong-but-can-be-optimized",
+      "title": "Implement the new top section on the member dashboard with: (1) concierge name and photo, (2) a Portfolio Health Score display (e.g., “82/100”), and (3) the short summary text exactly: “Your portfolio is strong but can be optimized.”",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-pb-black-insights-section-on-the-member-dashboard-containing-monthly-advisory-note-medical-inflation-trends-and-coverage-suggestions-present-these-as-advisory-intelligence-content-not-as-forms-or-transactional-ctas",
+      "title": "Add a “PB Black Insights” section on the member dashboard containing: Monthly advisory note, Medical inflation trends, and Coverage suggestions; present these as advisory/intelligence content (not as forms or transactional CTAs).",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-coverage-gap-analysis-section-on-the-member-dashboard-that-includes-missing-policies-underinsured-risks-and-suggested-upgrades-presented-in-a-clean-minimal-layout",
+      "title": "Add a “Coverage Gap Analysis” section on the member dashboard that includes: Missing policies, Underinsured risks, and Suggested upgrades, presented in a clean, minimal layout.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-claims-readiness-status-section-on-the-member-dashboard-that-includes-nominee-status-kyc-document-readiness-and-network-hospitals-shown-as-a-readiness-checklist-status-overview",
+      "title": "Add a “Claims Readiness Status” section on the member dashboard that includes: Nominee status, KYC, Document readiness, and Network hospitals, shown as a readiness checklist/status overview.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-upcoming-actions-section-on-the-member-dashboard-that-includes-renewals-review-meetings-and-alerts-designed-to-reduce-button-clutter-by-consolidating-next-steps-into-a-single-clean-list",
+      "title": "Add an “Upcoming Actions” section on the member dashboard that includes: Renewals, Review meetings, and Alerts, designed to reduce button clutter by consolidating next steps into a single, clean list.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-policy-list-frontend-src-components-pbblack-policiessection-tsx-to-use-collapsible-cards-accordion-style-with-a-clean-minimal-layout-removing-repetitive-per-policy-action-blocks-and-reducing-repeated-visuals",
+      "title": "Redesign the Policy list (frontend/src/components/pbblack/PoliciesSection.tsx) to use collapsible cards (accordion-style) with a clean minimal layout, removing repetitive per-policy action blocks and reducing repeated visuals.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-single-contact-my-manager-primary-cta-on-the-member-dashboard-one-button-total-for-the-page-that-offers-contact-options-email-phone-whatsapp-without-duplicating-these-actions-per-policy",
+      "title": "Provide a single “Contact My Manager” primary CTA on the member dashboard (one button total for the page) that offers contact options (email, phone, WhatsApp) without duplicating these actions per policy.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-pb-black-privileges-reminder-block-to-the-member-dashboard-in-a-premium-minimal-style-consistent-with-the-dark-luxury-gold-accent-theme",
+      "title": "Add a “PB Black Privileges” reminder block to the member dashboard in a premium, minimal style consistent with the dark luxury + gold accent theme.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-generic-footer-and-remove-all-caffeine-branding-from-the-member-dashboard-page-frontend-src-pages-memberdashboardpage-tsx-while-keeping-the-admin-route-unchanged-and-functional",
+      "title": "Remove the generic footer and remove all caffeine branding from the member dashboard page (frontend/src/pages/MemberDashboardPage.tsx), while keeping the /admin route unchanged and functional.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-redesigned-member-dashboard-is-not-repetitive-and-not-crm-like-by-consolidating-repeated-actions-and-avoiding-repeated-policy-blocks-retain-only-the-necessary-interaction-flows-callback-request-and-meeting-scheduling-in-a-way-that-does-not-clutter-the-policy-list",
+      "title": "Ensure the redesigned member dashboard is not repetitive and not CRM-like by consolidating repeated actions and avoiding repeated policy blocks; retain only the necessary interaction flows (callback request and meeting scheduling) in a way that does not clutter the policy list.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-pb-black-logo-being-clipped-cut-in-the-landing-page-top-header-on-all-responsive-breakpoints-by-adjusting-the-header-container-and-or-image-sizing-so-the-full-logo-is-always-visible",
+      "title": "Fix the PB Black logo being clipped/cut in the landing page top header on all responsive breakpoints by adjusting the header container and/or image sizing so the full logo is always visible.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-reduce-the-hero-headline-typography-size-and-replace-the-current-hero-headline-text-insurance-is-tested-during-crisis-pb-black-stands-beside-you-with-a-shorter-crisper-to-the-point-english-headline-while-keeping-the-overall-premium-tone",
+      "title": "Reduce the hero headline typography size and replace the current hero headline text \"Insurance is tested during crisis. PB Black stands beside you\" with a shorter, crisper, to-the-point English headline while keeping the overall premium tone.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-eligibility-section-card-for-hni-clients-to-change-the-annual-premium-threshold-from-annual-premium-25-000-to-annual-premium-100-000-english-user-facing",
+      "title": "Update the Eligibility section card for \"HNI Clients\" to change the annual premium threshold from “Annual premium ₹25,000+” to “Annual premium ₹100,000+” (English, user-facing).",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-separate-landing-page-section-as-its-own-component-focused-on-comprehensive-coverage-managed-by-one-dedicated-insurance-manager-across-all-insurance-types-and-explicitly-list-the-insurance-types-covered-in-english",
+      "title": "Add a separate landing-page section (as its own component) focused on comprehensive coverage managed by one dedicated insurance manager across all insurance types, and explicitly list the insurance types covered in English.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-re-run-the-standard-end-to-end-deploy-flow-so-the-application-is-live-ensuring-the-frontend-type-bindings-remain-compatible-with-the-backend-candid-interface-regenerate-update-frontend-declarations-if-required-by-the-build-system",
+      "title": "Re-run the standard end-to-end deploy flow so the application is live, ensuring the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations if required by the build system).",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -193,6 +445,92 @@
       "summary": "Fix backend Motoko compilation errors in backend/main.mo that can cause deployment to fail, including: (1) ensure the InviteRequest.compareByTimestamp function typechecks and actually returns an Order.Order; (2) add any missing imports used in backend/main.mo (e.g., Nat if Nat.compare is used); and (3) replace any invalid array-sorting usage (e.g., calling .sort on a Motoko array value) with a type-correct approach so getAllInviteRequests returns a sorted [InviteRequest] without compilation errors.",
       "reqIds": [
         "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Update/redo the \"Why PB Black\" section design on the landing page and ensure the first-page ecosystem-issues pointers are clearly included and visible.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Redesign landing page UI/UX to ultra-premium private-banking grade (dark + gold/white, generous spacing, minimal icons, strong section separation, short bold headings, no generic template feel) and remove any “Admin” and caffeine branding from public-facing pages.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Update landing-page information architecture and copy: new hero with emotionally powerful headline + subheading (Dedicated Insurance Manager, 24×7 Claims Support, 180-city presence) and CTA text “Check If You Qualify”; add Eligibility section immediately below hero; add scarcity messaging (limited quarterly onboarding).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add/replace sections on landing page: Emotional “Moment of Truth” claims section; comparison table (PB Black vs Traditional Advisors); strong proof section highlighting 600+ claim assistants, 180 cities, and ‘largest insurance seller’ positioning; add “What Happens Next” 3-step process.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Create a premium qualification form (landing page) capturing: name, phone, email, LinkedIn, total health cover, annual premium range, occupation, and preferred time to connect (in addition to existing invite-only framing).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Update the Motoko backend invite request model and APIs to support the additional qualification fields, and ensure the backend compiles and getAllInviteRequests returns a timestamp-sorted array without using invalid array sorting calls.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-28",
+      "summary": "If the backend InviteRequest stable structure changes due to the new qualification fields, add/adjust backend/migration.mo per the project migration policy so existing deployed state can be upgraded safely without data loss.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "Audit PB Black UI components to ensure they do not override the premium palette with non-premium defaults (e.g., unintended light backgrounds on cards/sections). Where needed, adjust component classNames to consistently use the theme tokens (background/foreground/card/muted/border) and gold accents.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Redesign the PB Black member dashboard to feel like a premium private-insurance command center (private banking-grade): top concierge header (name+photo) + Portfolio Health Score + short summary; add PB Black Insights (monthly note, medical inflation trends, coverage suggestions); add Coverage Gap Analysis (missing policies, underinsured risks, suggested upgrades); add Claims Readiness Status (nominee, KYC, docs, network hospitals); add Upcoming Actions (renewals, review meetings, alerts); make policy list collapsible minimal cards with a single “Contact My Manager” CTA; add PB Black Privileges reminder block; remove repetitive connect buttons, generic footer, and any caffeine branding.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-33",
+      "summary": "Fix landing page header/hero UI: PB logo at top is getting cut; reduce oversized hero headline font size and make the sentence crisp and to the point.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Update HNI Clients eligibility copy: change annual premium threshold from INR 25,000+ to INR 100,000+.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Add a separate landing-page section highlighting comprehensive coverage managed by one dedicated insurance manager across all insurance types, and explicitly list the insurance types covered.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Fix the Motoko backend compilation/type errors in `backend/main.mo` that can block deployment, including: (1) ensure `PremiumQualification.compareByTimestamp` returns an `Order.Order` and actually compares `timestamp` values; and (2) replace the invalid `allQualifications.sort(...)` usage with a type-correct approach that returns a sorted `[PremiumQualification]` from `getAllQualifications()`.",
+      "reqIds": [
+        "REQ-51"
       ],
       "status": "pending"
     }

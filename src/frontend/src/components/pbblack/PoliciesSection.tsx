@@ -1,11 +1,10 @@
-import { Shield, Car, Heart, Phone, Calendar, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Shield, Car, Heart, ChevronDown } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface Policy {
   id: string;
@@ -19,28 +18,12 @@ interface Policy {
   status: 'Active' | 'Expiring Soon' | 'Expired';
 }
 
-interface PoliciesSectionProps {
-  onConnectManager: () => void;
-  onRequestCallback: (policyType: string) => void;
-  onScheduleMeeting: (policyType: string) => void;
-  managerDetails: {
-    email: string;
-    phone: string;
-    whatsapp: string;
-  };
-}
-
-export default function PoliciesSection({
-  onConnectManager,
-  onRequestCallback,
-  onScheduleMeeting,
-  managerDetails,
-}: PoliciesSectionProps) {
+export default function PoliciesSection() {
   const policies: Policy[] = [
     {
       id: '1',
       type: 'Health Insurance',
-      icon: <Heart className="w-6 h-6 text-gold" />,
+      icon: <Heart className="w-5 h-5 text-gold" />,
       insurer: 'Star Health Insurance',
       policyNumber: 'SH-2024-789456',
       sumInsured: '₹50,00,000',
@@ -51,7 +34,7 @@ export default function PoliciesSection({
     {
       id: '2',
       type: 'Term Insurance',
-      icon: <Shield className="w-6 h-6 text-gold" />,
+      icon: <Shield className="w-5 h-5 text-gold" />,
       insurer: 'HDFC Life Insurance',
       policyNumber: 'HDFC-TERM-456123',
       sumInsured: '₹1,00,00,000',
@@ -62,7 +45,7 @@ export default function PoliciesSection({
     {
       id: '3',
       type: 'Motor Insurance',
-      icon: <Car className="w-6 h-6 text-gold" />,
+      icon: <Car className="w-5 h-5 text-gold" />,
       insurer: 'ICICI Lombard',
       policyNumber: 'ICICI-MTR-321789',
       sumInsured: '₹15,00,000 (IDV)',
@@ -84,54 +67,44 @@ export default function PoliciesSection({
   };
 
   return (
-    <div className="space-y-6">
-      {policies.map((policy) => (
-        <div
-          key={policy.id}
-          className="bg-card border border-border rounded-lg p-6 hover:border-gold/50 transition-all duration-300 shadow-sm hover:shadow-gold"
-        >
-          <div className="grid lg:grid-cols-[auto_1fr_auto] gap-6 items-start">
-            {/* Icon & Type */}
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
-                {policy.icon}
-              </div>
-              <div className="lg:hidden">
-                <h4 className="text-xl font-serif font-bold text-foreground mb-1">
-                  {policy.type}
-                </h4>
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                    policy.status
-                  )}`}
-                >
-                  {policy.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Policy Details */}
-            <div className="space-y-4">
-              <div className="hidden lg:flex items-center gap-4">
-                <h4 className="text-xl font-serif font-bold text-foreground">
-                  {policy.type}
-                </h4>
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                    policy.status
-                  )}`}
-                >
-                  {policy.status}
-                </span>
-              </div>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Insurer</p>
-                  <p className="text-sm font-medium text-foreground">
-                    {policy.insurer}
-                  </p>
+    <section>
+      <h3 className="text-2xl font-serif font-bold mb-6 gold-text">
+        Your Policies
+      </h3>
+      <Accordion type="single" collapsible className="space-y-4">
+        {policies.map((policy) => (
+          <AccordionItem
+            key={policy.id}
+            value={policy.id}
+            className="bg-card border border-border rounded-lg overflow-hidden hover:border-gold/30 transition-all duration-300"
+          >
+            <AccordionTrigger className="px-6 py-4 hover:no-underline [&[data-state=open]]:border-b [&[data-state=open]]:border-border">
+              <div className="flex items-center gap-4 flex-1 text-left">
+                <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                  {policy.icon}
                 </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h4 className="text-base font-semibold text-foreground">
+                      {policy.type}
+                    </h4>
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                        policy.status
+                      )}`}
+                    >
+                      {policy.status}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-muted-foreground">
+                    <span>{policy.insurer}</span>
+                    <span>Renewal: {policy.renewalDate}</span>
+                  </div>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-6 py-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
                     Policy Number
@@ -163,77 +136,10 @@ export default function PoliciesSection({
                   </p>
                 </div>
               </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col gap-2 w-full lg:w-auto">
-              {/* Connect to Manager Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full lg:w-48 border-gold/30 hover:border-gold hover:bg-gold/10"
-                  >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Connect to Manager
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem asChild>
-                    <a
-                      href={`mailto:${managerDetails.email}?subject=Query about ${policy.type}`}
-                      className="cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Send Email
-                    </a>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a
-                      href={`tel:${managerDetails.phone}`}
-                      className="cursor-pointer"
-                    >
-                      <Phone className="w-4 h-4 mr-2" />
-                      Call Now
-                    </a>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a
-                      href={`https://wa.me/${managerDetails.whatsapp}?text=Hi, I have a query about my ${policy.type}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      WhatsApp
-                    </a>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Request Callback */}
-              <Button
-                variant="outline"
-                className="w-full lg:w-48 border-gold/30 hover:border-gold hover:bg-gold/10"
-                onClick={() => onRequestCallback(policy.type)}
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Request a Callback
-              </Button>
-
-              {/* Schedule Meeting */}
-              <Button
-                variant="outline"
-                className="w-full lg:w-48 border-gold/30 hover:border-gold hover:bg-gold/10"
-                onClick={() => onScheduleMeeting(policy.type)}
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Schedule a Meeting
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </section>
   );
 }

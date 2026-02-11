@@ -1,58 +1,68 @@
 {
   "kind": "build_request",
-  "title": "Fix deployment failure by resolving Motoko compilation issues and restoring successful deploy",
+  "title": "Fix deployment blockers and deploy PB Black app live",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-17",
-      "text": "Fix backend Motoko compilation errors in backend/main.mo that can cause deployment to fail, including: (1) ensure the InviteRequest.compareByTimestamp function typechecks and actually returns an Order.Order; (2) add any missing imports used in backend/main.mo (e.g., Nat if Nat.compare is used); and (3) replace any invalid array-sorting usage (e.g., calling .sort on a Motoko array value) with a type-correct approach so getAllInviteRequests returns a sorted [InviteRequest] without compilation errors.",
+      "id": "REQ-51",
+      "text": "Fix the Motoko backend compilation/type errors in `backend/main.mo` that can block deployment, including: (1) ensure `PremiumQualification.compareByTimestamp` returns an `Order.Order` and actually compares `timestamp` values; and (2) replace the invalid `allQualifications.sort(...)` usage with a type-correct approach that returns a sorted `[PremiumQualification]` from `getAllQualifications()`.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-4"
         ],
         "quotes": [
-          "Pls try to sort that out"
+          "Pls make it live. waiting for it to go live"
         ]
       },
       "acceptanceCriteria": [
-        "The backend canister compiles without errors.",
-        "The getAllInviteRequests query returns a stable, correctly sorted [InviteRequest] (most-recent-first or requestId order is acceptable as long as it is deterministic and documented in code)."
+        "`backend/main.mo` compiles successfully.",
+        "`PremiumQualification.compareByTimestamp` returns an `Order.Order` and is based on `timestamp` ordering (newest-first or oldest-first must be consistent and documented in code comments).",
+        "`getAllQualifications()` returns a sorted Motoko array without calling a non-existent `.sort` method on a Motoko array value.",
+        "Admin-only authorization checks for `getAllQualifications()` remain intact (unauthorized callers still trap)."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+      "id": "REQ-52",
+      "text": "Re-run the standard end-to-end deploy flow so the application is live, ensuring the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations if required by the build system).",
       "target": "both",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2",
-          "msg-3"
+          "msg-4"
         ],
         "quotes": [
-          "🙏 We hit a snag during deployment",
-          "Deployment error",
-          "Pls try to sort that out"
+          "Pls make it live. waiting for it to go live"
         ]
       },
       "acceptanceCriteria": [
-        "A clean build and deploy completes successfully (backend + frontend).",
-        "The frontend compiles successfully with TypeScript and can call the backend methods used in frontend/src/hooks/useQueries.ts (e.g., submitInviteRequest, checkInviteStatus, getAllInviteRequests, getAllManagers, approveInvite, rejectInvite, addManager, removeManager)."
+        "Deployment completes without errors.",
+        "Landing page route `/` loads successfully in the deployed environment.",
+        "`/admin` route remains functional and still requires Internet Identity + admin authorization to access admin actions.",
+        "Frontend builds successfully against the deployed backend interface (no Candid/type mismatches)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; introduce backend/migration.mo only if an actual stable-state upgrade is required.",
-    "Do not edit any files under frontend/src/components/ui or any other immutable paths listed in SYSTEM_CONTEXT.",
-    "Use English for all user-facing text."
+    "Backend must remain a single Motoko actor in `backend/main.mo` (no additional backend services).",
+    "Only create `backend/migration.mo` if a stable-state upgrade is required by changes made in this request (follow the project’s conditional migration policy).",
+    "Do not edit files under `frontend/src/components/ui` or other immutable frontend paths listed in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Adding new product features or changing existing UX flows.",
-    "Introducing new backend services, external databases, or third-party integrations."
+    "No new landing-page copy/design changes beyond what is required to successfully build and deploy.",
+    "No new product features or new routes as part of this ‘go live’ request."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

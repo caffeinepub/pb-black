@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-11T07:26:48.309Z",
+  "generatedAt": "2026-02-11T08:23:11.899Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,20 +11,19 @@
     "implemented": 1,
     "items": [
       {
-        "id": "REQ-17",
-        "summary": "Fix backend Motoko compilation errors in backend/main.mo that can cause deployment to fail, including: (1) ensure the InviteRequest.compareByTimestamp function typechecks and actually returns an Order.Order; (2) add any missing imports used in backend/main.mo (e.g., Nat if Nat.compare is used); and (3) replace any invalid array-sorting usage (e.g., calling .sort on a Motoko array value) with a type-correct approach so getAllInviteRequests returns a sorted [InviteRequest] without compilation errors.",
+        "id": "REQ-51",
+        "summary": "Fix the Motoko backend compilation/type errors in `backend/main.mo` that can block deployment, including: (1) ensure `PremiumQualification.compareByTimestamp` returns an `Order.Order` and actually compares `timestamp` values; and (2) replace the invalid `allQualifications.sort(...)` usage with a type-correct approach that returns a sorted `[PremiumQualification]` from `getAllQualifications()`.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-18",
-        "summary": "Restore successful full deployment by re-running the standard deploy flow after the backend fixes, and ensure the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required by the build system) so the application builds and deploys end-to-end without errors.",
+        "id": "REQ-52",
+        "summary": "Re-run the standard end-to-end deploy flow so the application is live, ensuring the frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations if required by the build system).",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/backend.d.ts",
-          "frontend/src/hooks/useActor.ts",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/hooks/useActor.ts"
         ],
         "matchedFiles": [
           "frontend/src/backend.d.ts"
@@ -33,10 +32,8 @@
     ]
   },
   "changedFiles": [
-    "backend/invite-links/invite-links-module.mo",
     "backend/main.mo",
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",

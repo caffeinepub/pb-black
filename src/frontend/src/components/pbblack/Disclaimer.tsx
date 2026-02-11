@@ -7,17 +7,18 @@ interface DisclaimerProps {
 export default function Disclaimer({ className = '' }: DisclaimerProps) {
   return (
     <div className={`max-w-3xl mx-auto ${className}`}>
-      <div className="bg-muted/30 border border-border rounded-lg p-6">
+      <div className="bg-card/50 border border-border/50 rounded-lg p-6">
         <div className="flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-gold flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-muted-foreground space-y-2">
+          <div className="space-y-2 text-sm text-muted-foreground">
             <p>
-              <strong className="text-foreground">Important:</strong> PB Black is an invite-only service. 
-              Submitting this form is a request for invitation and does not guarantee acceptance or enrollment.
+              <strong className="text-foreground">Invite-Only Service:</strong> PB Black membership is by invitation only. 
+              Submission of this application does not guarantee acceptance.
             </p>
             <p>
-              Our services provide insurance management and concierge support. We do not guarantee specific 
-              underwriting outcomes or claim approvals, which remain subject to policy terms and insurer decisions.
+              <strong className="text-foreground">No Guarantees:</strong> While we provide dedicated concierge support, 
+              insurance underwriting and claims decisions are made by insurance companies per policy terms. 
+              PB Black does not guarantee policy approval or claim outcomes.
             </p>
           </div>
         </div>

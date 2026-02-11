@@ -15,17 +15,6 @@ export interface InviteCode {
   'code' : string,
   'used' : boolean,
 }
-export interface InviteRequest {
-  'status' : InviteStatus,
-  'linkedin' : string,
-  'requestId' : bigint,
-  'source' : string,
-  'name' : string,
-  'email' : string,
-  'assignedManagerId' : [] | [bigint],
-  'timestamp' : bigint,
-  'phone' : string,
-}
 export type InviteStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
@@ -35,6 +24,37 @@ export interface Manager {
   'contactInfo' : [] | [string],
   'name' : string,
 }
+export type ManagerId = bigint;
+export type Occupation = { 'ceoOrExecutive' : null } |
+  { 'entrepreneurBusinessOwner' : null } |
+  { 'partnerOrDirector' : null } |
+  { 'lawProfessional' : null } |
+  { 'medicalProfessional' : null } |
+  { 'notListed' : null } |
+  { 'pilot' : null } |
+  { 'corporateProfessional' : null };
+export type PreferredCallTime = { 'morning' : null } |
+  { 'evening' : null } |
+  { 'afternoon' : null };
+export type PremiumIncomeRange = { 'range50kTo75k' : null } |
+  { 'range25kTo50k' : null } |
+  { 'range75kTo100k' : null } |
+  { 'range100kPlus' : null };
+export interface PremiumQualification {
+  'id' : bigint,
+  'occupation' : Occupation,
+  'status' : InviteStatus,
+  'linkedin' : string,
+  'preferredCallTime' : PreferredCallTime,
+  'annualPremiumRange' : PremiumIncomeRange,
+  'name' : string,
+  'email' : string,
+  'referredBy' : [] | [string],
+  'timestamp' : bigint,
+  'totalHealthCover' : [] | [bigint],
+  'phone' : string,
+}
+export type PremiumQualificationId = bigint;
 export interface RSVP {
   'name' : string,
   'inviteCode' : string,
@@ -42,29 +62,48 @@ export interface RSVP {
   'attending' : boolean,
 }
 export type Time = bigint;
+export interface UserProfile { 'name' : string, 'email' : [] | [string] }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addManager' : ActorMethod<[string, [] | [string], [] | [string]], bigint>,
-  'approveInvite' : ActorMethod<[bigint], undefined>,
+  'addManager' : ActorMethod<[string, [] | [string], [] | [string]], ManagerId>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'checkInviteStatus' : ActorMethod<[string], [] | [InviteRequest]>,
+  'checkQualificationStatus' : ActorMethod<
+    [string],
+    [] | [PremiumQualification]
+  >,
   'generateInviteCode' : ActorMethod<[], string>,
-  'getAllInviteRequests' : ActorMethod<[], Array<InviteRequest>>,
   'getAllManagers' : ActorMethod<[], Array<Manager>>,
+  'getAllQualifications' : ActorMethod<[], Array<PremiumQualification>>,
   'getAllRSVPs' : ActorMethod<[], Array<RSVP>>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getInviteCodes' : ActorMethod<[], Array<InviteCode>>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'rejectInvite' : ActorMethod<[bigint], undefined>,
-  'removeManager' : ActorMethod<[bigint], undefined>,
-  'submitInviteRequest' : ActorMethod<
-    [string, string, string, string, string],
-    bigint
+  'removeManager' : ActorMethod<[ManagerId], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitQualification' : ActorMethod<
+    [
+      string,
+      string,
+      string,
+      string,
+      [] | [string],
+      [] | [bigint],
+      PremiumIncomeRange,
+      Occupation,
+      PreferredCallTime,
+    ],
+    PremiumQualificationId
   >,
   'submitRSVP' : ActorMethod<[string, boolean, string], undefined>,
+  'updateQualificationStatus' : ActorMethod<
+    [PremiumQualificationId, InviteStatus],
+    undefined
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

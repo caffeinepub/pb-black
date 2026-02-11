@@ -1,47 +1,44 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-11T07:26:48.306Z",
-  "summary": "REQ-17 appears not fully implemented: the new InviteRequest.compareByTimestamp definition in backend/main.mo likely still does not typecheck because it discards the Order.Order result. The diff does show an added Nat import, but there’s no clear evidence (in the truncated diff) that getAllInviteRequests was fixed to use a type-correct, deterministic sorting approach. REQ-18 is not evidenced: no frontend candid/type declaration regeneration or compatibility updates are shown, only changes to summary/metadata files.",
+  "generatedAt": "2026-02-11T08:23:11.895Z",
+  "summary": "REQ-51 is partially evidenced: `compareByTimestamp` was added/updated to return `Order.Order` and compare `timestamp` values (descending/newest-first). However, the diff summary is truncated before `getAllQualifications()`, so the required replacement of the invalid `allQualifications.sort(...)` usage and preservation of admin-only authorization for that endpoint are not verifiable from the provided changes. REQ-52 (end-to-end deploy flow + regenerated frontend bindings) is not evidenced by the diff summary. The diff also contains indications of substantial frontend/product work (landing page redesign, member dashboard, /member route) that are out of scope for a go-live deployment-blocker fix.",
   "missing_requirements": [
     {
-      "id": "REQ-17",
-      "requirement": "Ensure InviteRequest.compareByTimestamp typechecks and actually returns an Order.Order.",
-      "reason": "In backend/main.mo, compareByTimestamp calls Nat.compare(a.requestId, b.requestId); but ends the expression with a semicolon, which discards the value and would not satisfy the declared return type Order.Order.",
+      "id": "REQ-51",
+      "requirement": "Replace invalid `allQualifications.sort(...)` usage with a type-correct approach that returns a sorted `[PremiumQualification]` from `getAllQualifications()` (and keep admin-only authorization checks intact).",
+      "reason": "`backend/main.mo` diff is truncated before `getAllQualifications()`; there is no visible evidence that `getAllQualifications()` was updated to return a sorted array without calling a non-existent `.sort`, nor that the admin-only trap behavior remains intact.",
       "evidence": [
-        "backend/main.mo"
+        "backend/main.mo (truncated)"
       ]
     },
     {
-      "id": "REQ-17",
-      "requirement": "Replace invalid array-sorting usage with a type-correct approach so getAllInviteRequests returns a deterministically sorted [InviteRequest] without compilation errors, and document the deterministic ordering.",
-      "reason": "The diff is truncated before any getAllInviteRequests implementation is shown, so there is no evidence that the array-sorting issue was addressed or that deterministic sorting is implemented/documented.",
+      "id": "REQ-52",
+      "requirement": "Re-run standard end-to-end deploy flow so the app is live, ensuring frontend bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations if required).",
+      "reason": "No deployment artifacts, candid/declaration regeneration outputs, or binding/interface update evidence is included in the diff summary (only code/state summary files are shown as modified).",
       "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "requirement": "Ensure frontend type bindings remain compatible with the backend Candid interface (regenerate/update frontend declarations/types if required) so the app builds and deploys end-to-end without errors.",
-      "reason": "No changes are shown to generated declarations/types (e.g., did declarations) or any frontend binding files; only backend/main.mo and two project metadata/summary files were modified.",
-      "evidence": [
-        "frontend-file-summaries.txt",
-        "project_state.json",
-        "backend/main.mo"
+        "Modified files list shows only: backend/main.mo, frontend-file-summaries.txt, project_state.json"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Updates to project/feature summary metadata unrelated to fixing Motoko compilation/deploy (e.g., extensive frontend feature/page descriptions and project state summary).",
-      "reason": "BuildRequest scope is to fix backend compilation and restore deploy; modifying frontend-file-summaries.txt and project_state.json appears unrelated to those requirements and may represent unrequested work.",
+      "description": "Member dashboard product work and `/member` route (new route/features), which violates the non-goal of “No new product features or new routes” for this go-live request.",
+      "reason": "The diff summary describes an app route `/member` and a redesigned member dashboard page with many new UI elements; these are not requested by REQ-51/REQ-52 and conflict with stated non-goals.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "project_state.json"
+        "frontend-file-summaries.txt (mentions `frontend/src/App.tsx` routing including `/member` and `frontend/src/pages/MemberDashboardPage.tsx` redesign)"
+      ]
+    },
+    {
+      "description": "Landing page redesign/section additions (e.g., “ComprehensiveCoverageSection”, multiple UI redesign changes), beyond what is required to build/deploy.",
+      "reason": "BuildRequest explicitly states no new landing-page copy/design changes beyond what is required to successfully build and deploy; the diff summary describes substantial landing page redesign work.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions `frontend/src/pages/PBBlackLandingPage.tsx` redesign and new section)",
+        "project_state.json (summary describes redesign work for landing page and member dashboard)"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.62,
   "changed_files": [
     "backend/main.mo",
     "frontend-file-summaries.txt",

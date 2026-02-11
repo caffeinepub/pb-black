@@ -1,65 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { InviteRequest, Manager, UserRole } from '../backend';
+import type { 
+  PremiumQualification, 
+  Manager, 
+  InviteStatus,
+  PremiumIncomeRange,
+  Occupation,
+  PreferredCallTime
+} from '../backend';
 
-// Query: Get all invite requests (admin only)
-export function useGetAllInviteRequests() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<InviteRequest[]>({
-    queryKey: ['inviteRequests'],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllInviteRequests();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Query: Get all managers
-export function useGetAllManagers() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<Manager[]>({
-    queryKey: ['managers'],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllManagers();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Query: Check invite status by email
-export function useCheckInviteStatus(email: string) {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<InviteRequest | null>({
-    queryKey: ['inviteStatus', email],
-    queryFn: async () => {
-      if (!actor || !email) return null;
-      return actor.checkInviteStatus(email);
-    },
-    enabled: !!actor && !isFetching && !!email,
-  });
-}
-
-// Query: Get caller user role
-export function useGetCallerUserRole() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery<UserRole>({
-    queryKey: ['userRole'],
-    queryFn: async () => {
-      if (!actor) return 'guest' as UserRole;
-      return actor.getCallerUserRole();
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
-// Mutation: Submit invite request
-export function useSubmitInviteRequest() {
+export function useSubmitQualification() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
@@ -69,87 +19,124 @@ export function useSubmitInviteRequest() {
       email: string;
       phone: string;
       linkedin: string;
-      source: string;
+      referredBy: string | null;
+      totalHealthCover: bigint | null;
+      annualPremiumRange: PremiumIncomeRange;
+      occupation: Occupation;
+      preferredCallTime: PreferredCallTime;
     }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.submitInviteRequest(
+      if (!actor) throw new Error('Actor not initialized');
+      return actor.submitQualification(
         data.name,
         data.email,
         data.phone,
         data.linkedin,
-        data.source
+        data.referredBy,
+        data.totalHealthCover,
+        data.annualPremiumRange,
+        data.occupation,
+        data.preferredCallTime
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inviteRequests'] });
-    },
+      queryClient.invalidateQueries({ queryKey: ['qualifications'] });
+    }
   });
 }
 
-// Mutation: Approve invite
-export function useApproveInvite() {
+export function useCheckQualificationStatus(email: string) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<PremiumQualification | null>({
+    queryKey: ['qualificationStatus', email],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.checkQualificationStatus(email);
+    },
+    enabled: !!actor && !isFetching && !!email
+  });
+}
+
+export function useGetAllQualifications() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<PremiumQualification[]>({
+    queryKey: ['qualifications'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllQualifications();
+    },
+    enabled: !!actor && !isFetching
+  });
+}
+
+export function useUpdateQualificationStatus() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (requestId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.approveInvite(requestId);
+    mutationFn: async ({ qualificationId, status }: { qualificationId: bigint; status: InviteStatus }) => {
+      if (!actor) throw new Error('Actor not initialized');
+      return actor.updateQualificationStatus(qualificationId, status);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inviteRequests'] });
-    },
+      queryClient.invalidateQueries({ queryKey: ['qualifications'] });
+    }
   });
 }
 
-// Mutation: Reject invite
-export function useRejectInvite() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
+export function useGetAllManagers() {
+  const { actor, isFetching } = useActor();
 
-  return useMutation({
-    mutationFn: async (requestId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.rejectInvite(requestId);
+  return useQuery<Manager[]>({
+    queryKey: ['managers'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getAllManagers();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inviteRequests'] });
-    },
+    enabled: !!actor && !isFetching
   });
 }
 
-// Mutation: Add manager
 export function useAddManager() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: {
-      name: string;
-      bio: string | null;
-      contactInfo: string | null;
-    }) => {
-      if (!actor) throw new Error('Actor not available');
+    mutationFn: async (data: { name: string; bio: string | null; contactInfo: string | null }) => {
+      if (!actor) throw new Error('Actor not initialized');
       return actor.addManager(data.name, data.bio, data.contactInfo);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['managers'] });
-    },
+    }
   });
 }
 
-// Mutation: Remove manager
 export function useRemoveManager() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (managerId: bigint) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error('Actor not initialized');
       return actor.removeManager(managerId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['managers'] });
+    }
+  });
+}
+
+export function useIsCurrentUserAdmin() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['isAdmin'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isCallerAdmin();
     },
+    enabled: !!actor && !isFetching
   });
 }

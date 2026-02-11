@@ -89,39 +89,69 @@ export class ExternalBlob {
         return this;
     }
 }
-export type Time = bigint;
-export interface Manager {
-    id: bigint;
-    bio?: string;
-    contactInfo?: string;
-    name: string;
-}
-export interface InviteRequest {
-    status: InviteStatus;
-    linkedin: string;
-    requestId: bigint;
-    source: string;
-    name: string;
-    email: string;
-    assignedManagerId?: bigint;
-    timestamp: bigint;
-    phone: string;
-}
-export interface InviteCode {
-    created: Time;
-    code: string;
-    used: boolean;
-}
 export interface RSVP {
     name: string;
     inviteCode: string;
     timestamp: Time;
     attending: boolean;
 }
+export type ManagerId = bigint;
+export type Time = bigint;
+export interface InviteCode {
+    created: Time;
+    code: string;
+    used: boolean;
+}
+export interface PremiumQualification {
+    id: bigint;
+    occupation: Occupation;
+    status: InviteStatus;
+    linkedin: string;
+    preferredCallTime: PreferredCallTime;
+    annualPremiumRange: PremiumIncomeRange;
+    name: string;
+    email: string;
+    referredBy?: string;
+    timestamp: bigint;
+    totalHealthCover?: bigint;
+    phone: string;
+}
+export interface Manager {
+    id: bigint;
+    bio?: string;
+    contactInfo?: string;
+    name: string;
+}
+export type PremiumQualificationId = bigint;
+export interface UserProfile {
+    name: string;
+    email?: string;
+}
 export enum InviteStatus {
     pending = "pending",
     approved = "approved",
     rejected = "rejected"
+}
+export enum Occupation {
+    ceoOrExecutive = "ceoOrExecutive",
+    entrepreneurBusinessOwner = "entrepreneurBusinessOwner",
+    partnerOrDirector = "partnerOrDirector",
+    lawProfessional = "lawProfessional",
+    medicalProfessional = "medicalProfessional",
+    notListed = "notListed",
+    pilot = "pilot",
+    corporateProfessional = "corporateProfessional"
+}
+export enum PreferredCallTime {
+    morning = "morning",
+    evening = "evening",
+    afternoon = "afternoon"
+}
+export enum PremiumIncomeRange {
+    range50kTo75k = "range50kTo75k",
+    range25kTo50k = "range25kTo50k",
+    range75kTo100k = "range75kTo100k",
+    range100kPlus = "range100kPlus"
 }
 export enum UserRole {
     admin = "admin",
@@ -130,23 +160,25 @@ export enum UserRole {
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
-    addManager(name: string, bio: string | null, contactInfo: string | null): Promise<bigint>;
-    approveInvite(requestId: bigint): Promise<void>;
+    addManager(name: string, bio: string | null, contactInfo: string | null): Promise<ManagerId>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    checkInviteStatus(email: string): Promise<InviteRequest | null>;
+    checkQualificationStatus(email: string): Promise<PremiumQualification | null>;
     generateInviteCode(): Promise<string>;
-    getAllInviteRequests(): Promise<Array<InviteRequest>>;
     getAllManagers(): Promise<Array<Manager>>;
+    getAllQualifications(): Promise<Array<PremiumQualification>>;
     getAllRSVPs(): Promise<Array<RSVP>>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getInviteCodes(): Promise<Array<InviteCode>>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    rejectInvite(requestId: bigint): Promise<void>;
-    removeManager(managerId: bigint): Promise<void>;
-    submitInviteRequest(name: string, email: string, phone: string, linkedin: string, source: string): Promise<bigint>;
+    removeManager(managerId: ManagerId): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    submitQualification(name: string, email: string, phone: string, linkedin: string, referredBy: string | null, totalHealthCover: bigint | null, annualPremiumRange: PremiumIncomeRange, occupation: Occupation, preferredCallTime: PreferredCallTime): Promise<PremiumQualificationId>;
     submitRSVP(name: string, attending: boolean, inviteCode: string): Promise<void>;
+    updateQualificationStatus(qualificationId: PremiumQualificationId, newStatus: InviteStatus): Promise<void>;
 }
-import type { InviteRequest as _InviteRequest, InviteStatus as _InviteStatus, Manager as _Manager, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { InviteStatus as _InviteStatus, Manager as _Manager, Occupation as _Occupation, PreferredCallTime as _PreferredCallTime, PremiumIncomeRange as _PremiumIncomeRange, PremiumQualification as _PremiumQualification, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -163,7 +195,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async addManager(arg0: string, arg1: string | null, arg2: string | null): Promise<bigint> {
+    async addManager(arg0: string, arg1: string | null, arg2: string | null): Promise<ManagerId> {
         if (this.processError) {
             try {
                 const result = await this.actor.addManager(arg0, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg2));
@@ -174,20 +206,6 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.addManager(arg0, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n1(this._uploadFile, this._downloadFile, arg2));
-            return result;
-        }
-    }
-    async approveInvite(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.approveInvite(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.approveInvite(arg0);
             return result;
         }
     }
@@ -205,17 +223,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async checkInviteStatus(arg0: string): Promise<InviteRequest | null> {
+    async checkQualificationStatus(arg0: string): Promise<PremiumQualification | null> {
         if (this.processError) {
             try {
-                const result = await this.actor.checkInviteStatus(arg0);
+                const result = await this.actor.checkQualificationStatus(arg0);
                 return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.checkInviteStatus(arg0);
+            const result = await this.actor.checkQualificationStatus(arg0);
             return from_candid_opt_n4(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -233,32 +251,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getAllInviteRequests(): Promise<Array<InviteRequest>> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getAllInviteRequests();
-                return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getAllInviteRequests();
-            return from_candid_vec_n10(this._uploadFile, this._downloadFile, result);
-        }
-    }
     async getAllManagers(): Promise<Array<Manager>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllManagers();
-                return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllManagers();
-            return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getAllQualifications(): Promise<Array<PremiumQualification>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllQualifications();
+                return from_candid_vec_n20(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllQualifications();
+            return from_candid_vec_n20(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllRSVPs(): Promise<Array<RSVP>> {
@@ -275,18 +293,32 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getCallerUserProfile(): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserProfile();
+                return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserProfile();
+            return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n24(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n15(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n24(this._uploadFile, this._downloadFile, result);
         }
     }
     async getInviteCodes(): Promise<Array<InviteCode>> {
@@ -303,6 +335,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserProfile(arg0);
+                return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserProfile(arg0);
+            return from_candid_opt_n21(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -317,21 +363,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async rejectInvite(arg0: bigint): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.rejectInvite(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.rejectInvite(arg0);
-            return result;
-        }
-    }
-    async removeManager(arg0: bigint): Promise<void> {
+    async removeManager(arg0: ManagerId): Promise<void> {
         if (this.processError) {
             try {
                 const result = await this.actor.removeManager(arg0);
@@ -345,17 +377,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async submitInviteRequest(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string): Promise<bigint> {
+    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.submitInviteRequest(arg0, arg1, arg2, arg3, arg4);
+                const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n26(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.submitInviteRequest(arg0, arg1, arg2, arg3, arg4);
+            const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n26(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async submitQualification(arg0: string, arg1: string, arg2: string, arg3: string, arg4: string | null, arg5: bigint | null, arg6: PremiumIncomeRange, arg7: Occupation, arg8: PreferredCallTime): Promise<PremiumQualificationId> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitQualification(arg0, arg1, arg2, arg3, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n28(this._uploadFile, this._downloadFile, arg5), to_candid_PremiumIncomeRange_n29(this._uploadFile, this._downloadFile, arg6), to_candid_Occupation_n31(this._uploadFile, this._downloadFile, arg7), to_candid_PreferredCallTime_n33(this._uploadFile, this._downloadFile, arg8));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitQualification(arg0, arg1, arg2, arg3, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n28(this._uploadFile, this._downloadFile, arg5), to_candid_PremiumIncomeRange_n29(this._uploadFile, this._downloadFile, arg6), to_candid_Occupation_n31(this._uploadFile, this._downloadFile, arg7), to_candid_PreferredCallTime_n33(this._uploadFile, this._downloadFile, arg8));
             return result;
         }
     }
@@ -373,29 +419,58 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async updateQualificationStatus(arg0: PremiumQualificationId, arg1: InviteStatus): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateQualificationStatus(arg0, to_candid_InviteStatus_n35(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateQualificationStatus(arg0, to_candid_InviteStatus_n35(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
 }
-function from_candid_InviteRequest_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _InviteRequest): InviteRequest {
-    return from_candid_record_n6(_uploadFile, _downloadFile, value);
+function from_candid_InviteStatus_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _InviteStatus): InviteStatus {
+    return from_candid_variant_n10(_uploadFile, _downloadFile, value);
 }
-function from_candid_InviteStatus_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _InviteStatus): InviteStatus {
+function from_candid_Manager_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Manager): Manager {
+    return from_candid_record_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_Occupation_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Occupation): Occupation {
     return from_candid_variant_n8(_uploadFile, _downloadFile, value);
 }
-function from_candid_Manager_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Manager): Manager {
-    return from_candid_record_n13(_uploadFile, _downloadFile, value);
+function from_candid_PreferredCallTime_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PreferredCallTime): PreferredCallTime {
+    return from_candid_variant_n12(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserRole_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n16(_uploadFile, _downloadFile, value);
+function from_candid_PremiumIncomeRange_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PremiumIncomeRange): PremiumIncomeRange {
+    return from_candid_variant_n14(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_PremiumQualification_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PremiumQualification): PremiumQualification {
+    return from_candid_record_n6(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserProfile_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserProfile): UserProfile {
+    return from_candid_record_n23(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n25(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_InviteRequest]): InviteRequest | null {
-    return value.length === 0 ? null : from_candid_InviteRequest_n5(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
+function from_candid_opt_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_record_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : from_candid_UserProfile_n22(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PremiumQualification]): PremiumQualification | null {
+    return value.length === 0 ? null : from_candid_PremiumQualification_n5(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_record_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     id: bigint;
     bio: [] | [string];
     contactInfo: [] | [string];
@@ -408,45 +483,95 @@ function from_candid_record_n13(_uploadFile: (file: ExternalBlob) => Promise<Uin
 } {
     return {
         id: value.id,
-        bio: record_opt_to_undefined(from_candid_opt_n14(_uploadFile, _downloadFile, value.bio)),
-        contactInfo: record_opt_to_undefined(from_candid_opt_n14(_uploadFile, _downloadFile, value.contactInfo)),
+        bio: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.bio)),
+        contactInfo: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.contactInfo)),
         name: value.name
     };
 }
+function from_candid_record_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    name: string;
+    email: [] | [string];
+}): {
+    name: string;
+    email?: string;
+} {
+    return {
+        name: value.name,
+        email: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.email))
+    };
+}
 function from_candid_record_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    occupation: _Occupation;
     status: _InviteStatus;
     linkedin: string;
-    requestId: bigint;
-    source: string;
+    preferredCallTime: _PreferredCallTime;
+    annualPremiumRange: _PremiumIncomeRange;
     name: string;
     email: string;
-    assignedManagerId: [] | [bigint];
+    referredBy: [] | [string];
     timestamp: bigint;
+    totalHealthCover: [] | [bigint];
     phone: string;
 }): {
+    id: bigint;
+    occupation: Occupation;
     status: InviteStatus;
     linkedin: string;
-    requestId: bigint;
-    source: string;
+    preferredCallTime: PreferredCallTime;
+    annualPremiumRange: PremiumIncomeRange;
     name: string;
     email: string;
-    assignedManagerId?: bigint;
+    referredBy?: string;
     timestamp: bigint;
+    totalHealthCover?: bigint;
     phone: string;
 } {
     return {
-        status: from_candid_InviteStatus_n7(_uploadFile, _downloadFile, value.status),
+        id: value.id,
+        occupation: from_candid_Occupation_n7(_uploadFile, _downloadFile, value.occupation),
+        status: from_candid_InviteStatus_n9(_uploadFile, _downloadFile, value.status),
         linkedin: value.linkedin,
-        requestId: value.requestId,
-        source: value.source,
+        preferredCallTime: from_candid_PreferredCallTime_n11(_uploadFile, _downloadFile, value.preferredCallTime),
+        annualPremiumRange: from_candid_PremiumIncomeRange_n13(_uploadFile, _downloadFile, value.annualPremiumRange),
         name: value.name,
         email: value.email,
-        assignedManagerId: record_opt_to_undefined(from_candid_opt_n9(_uploadFile, _downloadFile, value.assignedManagerId)),
+        referredBy: record_opt_to_undefined(from_candid_opt_n15(_uploadFile, _downloadFile, value.referredBy)),
         timestamp: value.timestamp,
+        totalHealthCover: record_opt_to_undefined(from_candid_opt_n16(_uploadFile, _downloadFile, value.totalHealthCover)),
         phone: value.phone
     };
 }
-function from_candid_variant_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+}): InviteStatus {
+    return "pending" in value ? InviteStatus.pending : "approved" in value ? InviteStatus.approved : "rejected" in value ? InviteStatus.rejected : value;
+}
+function from_candid_variant_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    morning: null;
+} | {
+    evening: null;
+} | {
+    afternoon: null;
+}): PreferredCallTime {
+    return "morning" in value ? PreferredCallTime.morning : "evening" in value ? PreferredCallTime.evening : "afternoon" in value ? PreferredCallTime.afternoon : value;
+}
+function from_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    range50kTo75k: null;
+} | {
+    range25kTo50k: null;
+} | {
+    range75kTo100k: null;
+} | {
+    range100kPlus: null;
+}): PremiumIncomeRange {
+    return "range50kTo75k" in value ? PremiumIncomeRange.range50kTo75k : "range25kTo50k" in value ? PremiumIncomeRange.range25kTo50k : "range75kTo100k" in value ? PremiumIncomeRange.range75kTo100k : "range100kPlus" in value ? PremiumIncomeRange.range100kPlus : value;
+}
+function from_candid_variant_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -456,25 +581,65 @@ function from_candid_variant_n16(_uploadFile: (file: ExternalBlob) => Promise<Ui
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
 function from_candid_variant_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    pending: null;
+    ceoOrExecutive: null;
 } | {
-    approved: null;
+    entrepreneurBusinessOwner: null;
 } | {
-    rejected: null;
-}): InviteStatus {
-    return "pending" in value ? InviteStatus.pending : "approved" in value ? InviteStatus.approved : "rejected" in value ? InviteStatus.rejected : value;
+    partnerOrDirector: null;
+} | {
+    lawProfessional: null;
+} | {
+    medicalProfessional: null;
+} | {
+    notListed: null;
+} | {
+    pilot: null;
+} | {
+    corporateProfessional: null;
+}): Occupation {
+    return "ceoOrExecutive" in value ? Occupation.ceoOrExecutive : "entrepreneurBusinessOwner" in value ? Occupation.entrepreneurBusinessOwner : "partnerOrDirector" in value ? Occupation.partnerOrDirector : "lawProfessional" in value ? Occupation.lawProfessional : "medicalProfessional" in value ? Occupation.medicalProfessional : "notListed" in value ? Occupation.notListed : "pilot" in value ? Occupation.pilot : "corporateProfessional" in value ? Occupation.corporateProfessional : value;
 }
-function from_candid_vec_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_InviteRequest>): Array<InviteRequest> {
-    return value.map((x)=>from_candid_InviteRequest_n5(_uploadFile, _downloadFile, x));
+function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Manager>): Array<Manager> {
+    return value.map((x)=>from_candid_Manager_n18(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Manager>): Array<Manager> {
-    return value.map((x)=>from_candid_Manager_n12(_uploadFile, _downloadFile, x));
+function from_candid_vec_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_PremiumQualification>): Array<PremiumQualification> {
+    return value.map((x)=>from_candid_PremiumQualification_n5(_uploadFile, _downloadFile, x));
+}
+function to_candid_InviteStatus_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: InviteStatus): _InviteStatus {
+    return to_candid_variant_n36(_uploadFile, _downloadFile, value);
+}
+function to_candid_Occupation_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Occupation): _Occupation {
+    return to_candid_variant_n32(_uploadFile, _downloadFile, value);
+}
+function to_candid_PreferredCallTime_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PreferredCallTime): _PreferredCallTime {
+    return to_candid_variant_n34(_uploadFile, _downloadFile, value);
+}
+function to_candid_PremiumIncomeRange_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PremiumIncomeRange): _PremiumIncomeRange {
+    return to_candid_variant_n30(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserProfile_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
+    return to_candid_record_n27(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n3(_uploadFile, _downloadFile, value);
 }
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: bigint | null): [] | [bigint] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_record_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    name: string;
+    email?: string;
+}): {
+    name: string;
+    email: [] | [string];
+} {
+    return {
+        name: value.name,
+        email: value.email ? candid_some(value.email) : candid_none()
+    };
 }
 function to_candid_variant_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;
@@ -489,6 +654,90 @@ function to_candid_variant_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         user: null
     } : value == UserRole.guest ? {
         guest: null
+    } : value;
+}
+function to_candid_variant_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PremiumIncomeRange): {
+    range50kTo75k: null;
+} | {
+    range25kTo50k: null;
+} | {
+    range75kTo100k: null;
+} | {
+    range100kPlus: null;
+} {
+    return value == PremiumIncomeRange.range50kTo75k ? {
+        range50kTo75k: null
+    } : value == PremiumIncomeRange.range25kTo50k ? {
+        range25kTo50k: null
+    } : value == PremiumIncomeRange.range75kTo100k ? {
+        range75kTo100k: null
+    } : value == PremiumIncomeRange.range100kPlus ? {
+        range100kPlus: null
+    } : value;
+}
+function to_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Occupation): {
+    ceoOrExecutive: null;
+} | {
+    entrepreneurBusinessOwner: null;
+} | {
+    partnerOrDirector: null;
+} | {
+    lawProfessional: null;
+} | {
+    medicalProfessional: null;
+} | {
+    notListed: null;
+} | {
+    pilot: null;
+} | {
+    corporateProfessional: null;
+} {
+    return value == Occupation.ceoOrExecutive ? {
+        ceoOrExecutive: null
+    } : value == Occupation.entrepreneurBusinessOwner ? {
+        entrepreneurBusinessOwner: null
+    } : value == Occupation.partnerOrDirector ? {
+        partnerOrDirector: null
+    } : value == Occupation.lawProfessional ? {
+        lawProfessional: null
+    } : value == Occupation.medicalProfessional ? {
+        medicalProfessional: null
+    } : value == Occupation.notListed ? {
+        notListed: null
+    } : value == Occupation.pilot ? {
+        pilot: null
+    } : value == Occupation.corporateProfessional ? {
+        corporateProfessional: null
+    } : value;
+}
+function to_candid_variant_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PreferredCallTime): {
+    morning: null;
+} | {
+    evening: null;
+} | {
+    afternoon: null;
+} {
+    return value == PreferredCallTime.morning ? {
+        morning: null
+    } : value == PreferredCallTime.evening ? {
+        evening: null
+    } : value == PreferredCallTime.afternoon ? {
+        afternoon: null
+    } : value;
+}
+function to_candid_variant_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: InviteStatus): {
+    pending: null;
+} | {
+    approved: null;
+} | {
+    rejected: null;
+} {
+    return value == InviteStatus.pending ? {
+        pending: null
+    } : value == InviteStatus.approved ? {
+        approved: null
+    } : value == InviteStatus.rejected ? {
+        rejected: null
     } : value;
 }
 export interface CreateActorOptions {

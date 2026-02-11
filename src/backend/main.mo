@@ -1,30 +1,59 @@
 import Map "mo:core/Map";
 import Text "mo:core/Text";
 import Array "mo:core/Array";
+import Iter "mo:core/Iter";
+import Runtime "mo:core/Runtime";
 import Nat "mo:core/Nat";
 import Order "mo:core/Order";
-import Runtime "mo:core/Runtime";
-import Iter "mo:core/Iter";
+import Int "mo:core/Int";
 import Time "mo:core/Time";
 import Random "mo:core/Random";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import InviteLinksModule "invite-links/invite-links-module";
 
+
+
 actor {
-  // Types
   public type InviteStatus = { #pending; #approved; #rejected };
 
-  public type InviteRequest = {
-    requestId : Nat;
+  public type PremiumIncomeRange = {
+    #range25kTo50k;
+    #range50kTo75k;
+    #range75kTo100k;
+    #range100kPlus;
+  };
+
+  public type Occupation = {
+    #ceoOrExecutive;
+    #partnerOrDirector;
+    #entrepreneurBusinessOwner;
+    #medicalProfessional;
+    #lawProfessional;
+    #pilot;
+    #corporateProfessional;
+    #notListed;
+  };
+
+  public type PreferredCallTime = {
+    #morning;
+    #afternoon;
+    #evening;
+  };
+
+  public type PremiumQualification = {
+    id : Nat;
     timestamp : Int;
     name : Text;
     email : Text;
     phone : Text;
     linkedin : Text;
-    source : Text;
+    referredBy : ?Text;
+    totalHealthCover : ?Nat;
+    annualPremiumRange : PremiumIncomeRange;
+    occupation : Occupation;
+    preferredCallTime : PreferredCallTime;
     status : InviteStatus;
-    assignedManagerId : ?Nat;
   };
 
   public type Manager = {
@@ -34,96 +63,115 @@ actor {
     contactInfo : ?Text;
   };
 
-  // State
-  var nextRequestId = 1;
-  var nextManagerId = 1;
-  var roundRobinIndex = 0;
-  var managerArray : [Manager] = [];
+  public type ManagerId = Nat;
+  public type PremiumQualificationId = Nat;
 
-  // Map usage for persistent storage
-  let inviteRequests = Map.empty<Nat, InviteRequest>();
-  let managers = Map.empty<Nat, Manager>();
+  public type UserProfile = {
+    name : Text;
+    email : ?Text;
+  };
+
+  var nextQualificationId = 1;
+  var nextManagerId : ManagerId = 1;
+
+  // Maps for persistent storage
+  let qualifications = Map.empty<PremiumQualificationId, PremiumQualification>();
+  let managers = Map.empty<ManagerId, Manager>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
 
   // Authorization
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Invite links system state initialization
+  // Invite links system state
   let inviteState = InviteLinksModule.initState();
 
-  // Custom compare function for InviteRequest
-  module InviteRequest {
-    public func compareByTimestamp(a : InviteRequest, b : InviteRequest) : Order.Order {
-      Nat.compare(a.requestId, b.requestId);
-    };
+  // Compare by timestamp for sorting (descending - newest first)
+  func compareByTimestamp(a : PremiumQualification, b : PremiumQualification) : Order.Order {
+    Int.compare(b.timestamp, a.timestamp);
   };
 
-  // Public API
-  public shared ({ caller }) func submitInviteRequest(name : Text, email : Text, phone : Text, linkedin : Text, source : Text) : async Nat {
-    let requestId = nextRequestId;
-    nextRequestId += 1;
+  // User profile management
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view profiles");
+    };
+    userProfiles.get(caller);
+  };
 
-    let newRequest : InviteRequest = {
-      requestId;
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
+
+  public shared ({ caller }) func submitQualification(
+    name : Text,
+    email : Text,
+    phone : Text,
+    linkedin : Text,
+    referredBy : ?Text,
+    totalHealthCover : ?Nat,
+    annualPremiumRange : PremiumIncomeRange,
+    occupation : Occupation,
+    preferredCallTime : PreferredCallTime,
+  ) : async PremiumQualificationId {
+    let id = nextQualificationId;
+    nextQualificationId += 1;
+
+    let newQualification : PremiumQualification = {
+      id;
       timestamp = Time.now();
       name;
       email;
       phone;
       linkedin;
-      source;
+      referredBy;
+      totalHealthCover;
+      annualPremiumRange;
+      occupation;
+      preferredCallTime;
       status = #pending;
-      assignedManagerId = null;
     };
 
-    inviteRequests.add(requestId, newRequest);
-    requestId;
+    qualifications.add(id, newQualification);
+    id;
   };
 
-  public query ({ caller }) func checkInviteStatus(email : Text) : async ?InviteRequest {
-    let invite = inviteRequests.values().find(func(invite) { invite.email == email });
-    invite;
+  public query ({ caller }) func checkQualificationStatus(email : Text) : async ?PremiumQualification {
+    let qualification = qualifications.values().find(
+      func(q) { q.email == email }
+    );
+    qualification;
   };
 
-  public shared ({ caller }) func approveInvite(requestId : Nat) : async () {
+  public shared ({ caller }) func updateQualificationStatus(qualificationId : PremiumQualificationId, newStatus : InviteStatus) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can approve invites");
+      Runtime.trap("Unauthorized: Only admins can update qualification status");
     };
 
-    switch (inviteRequests.get(requestId)) {
-      case (null) { Runtime.trap("Invite request not found") };
-      case (?invite) {
-        // Assign manager
-        if (managerArray.size() == 0) { Runtime.trap("No managers available") };
-
-        let manager = managerArray[roundRobinIndex % managerArray.size()];
-        roundRobinIndex += 1;
-
-        let updatedInvite : InviteRequest = {
-          invite with
-          status = #approved;
-          assignedManagerId = ?manager.id;
+    switch (qualifications.get(qualificationId)) {
+      case (null) {
+        Runtime.trap("Qualification not found");
+      };
+      case (?qualification) {
+        let updatedQualification : PremiumQualification = {
+          qualification with status = newStatus
         };
-
-        inviteRequests.add(requestId, updatedInvite);
+        qualifications.add(qualificationId, updatedQualification);
       };
     };
   };
 
-  public shared ({ caller }) func rejectInvite(requestId : Nat) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can reject invites");
-    };
-
-    switch (inviteRequests.get(requestId)) {
-      case (null) { Runtime.trap("Invite request not found") };
-      case (?invite) {
-        let updatedInvite : InviteRequest = { invite with status = #rejected };
-        inviteRequests.add(requestId, updatedInvite);
-      };
-    };
-  };
-
-  public shared ({ caller }) func addManager(name : Text, bio : ?Text, contactInfo : ?Text) : async Nat {
+  public shared ({ caller }) func addManager(name : Text, bio : ?Text, contactInfo : ?Text) : async ManagerId {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can add managers");
     };
@@ -139,26 +187,24 @@ actor {
     };
 
     managers.add(managerId, newManager);
-    managerArray := managers.values().toArray();
     managerId;
   };
 
-  public shared ({ caller }) func removeManager(managerId : Nat) : async () {
+  public shared ({ caller }) func removeManager(managerId : ManagerId) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can remove managers");
     };
 
     managers.remove(managerId);
-    managerArray := managers.values().toArray();
   };
 
-  public query ({ caller }) func getAllInviteRequests() : async [InviteRequest] {
+  public query ({ caller }) func getAllQualifications() : async [PremiumQualification] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can view all invite requests");
+      Runtime.trap("Unauthorized: Only admins can view all qualifications");
     };
 
-    let allRequests = inviteRequests.values().toArray();
-    allRequests.sort<InviteRequest>(InviteRequest.compareByTimestamp);
+    let allQuals = qualifications.values().toArray();
+    allQuals.sort(compareByTimestamp);
   };
 
   public query ({ caller }) func getAllManagers() : async [Manager] {

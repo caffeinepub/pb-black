@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { useCheckInviteStatus, useGetAllManagers } from '../../hooks/useQueries';
+import { useCheckQualificationStatus } from '../../hooks/useQueries';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import PremiumButton from './PremiumButton';
 import { validateEmail } from '../../lib/validators';
-import { CheckCircle2, XCircle, Clock, Loader2, User, ArrowRight } from 'lucide-react';
-import type { InviteRequest } from '../../backend';
+import { CheckCircle2, XCircle, Clock, Loader2, ArrowRight } from 'lucide-react';
+import type { PremiumQualification } from '../../backend';
+import { InviteStatus } from '../../backend';
 
 export default function InviteStatusChecker() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [searchedEmail, setSearchedEmail] = useState('');
 
-  const { data: status, isLoading, refetch } = useCheckInviteStatus(searchedEmail);
-  const { data: managers } = useGetAllManagers();
+  const { data: status, isLoading, refetch } = useCheckQualificationStatus(searchedEmail);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,42 +34,37 @@ export default function InviteStatusChecker() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
 
-  const getStatusIcon = (inviteStatus: InviteRequest['status']) => {
+  const getStatusIcon = (inviteStatus: PremiumQualification['status']) => {
     switch (inviteStatus) {
-      case 'approved':
+      case InviteStatus.approved:
         return <CheckCircle2 className="w-12 h-12 text-gold" />;
-      case 'rejected':
+      case InviteStatus.rejected:
         return <XCircle className="w-12 h-12 text-destructive" />;
-      case 'pending':
+      case InviteStatus.pending:
         return <Clock className="w-12 h-12 text-muted-foreground" />;
     }
   };
 
-  const getStatusText = (inviteStatus: InviteRequest['status']) => {
+  const getStatusText = (inviteStatus: PremiumQualification['status']) => {
     switch (inviteStatus) {
-      case 'approved':
+      case InviteStatus.approved:
         return 'Approved';
-      case 'rejected':
+      case InviteStatus.rejected:
         return 'Rejected';
-      case 'pending':
+      case InviteStatus.pending:
         return 'Pending Review';
     }
   };
 
-  const getStatusColor = (inviteStatus: InviteRequest['status']) => {
+  const getStatusColor = (inviteStatus: PremiumQualification['status']) => {
     switch (inviteStatus) {
-      case 'approved':
+      case InviteStatus.approved:
         return 'border-gold/50';
-      case 'rejected':
+      case InviteStatus.rejected:
         return 'border-destructive/50';
-      case 'pending':
+      case InviteStatus.pending:
         return 'border-border';
     }
-  };
-
-  const getAssignedManager = (managerId?: bigint) => {
-    if (!managerId || !managers) return null;
-    return managers.find(m => m.id === managerId);
   };
 
   return (
@@ -121,39 +116,12 @@ export default function InviteStatusChecker() {
                 Application for: {status.name}
               </p>
               
-              {status.status === 'approved' && status.assignedManagerId && (
+              {status.status === InviteStatus.approved && (
                 <>
                   <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-center justify-center gap-2 mb-3">
-                      <User className="w-5 h-5 text-gold" />
-                      <h4 className="text-lg font-semibold text-gold">
-                        Your Dedicated Manager
-                      </h4>
-                    </div>
-                    {(() => {
-                      const manager = getAssignedManager(status.assignedManagerId);
-                      return manager ? (
-                        <div className="bg-muted/30 rounded-lg p-4">
-                          <p className="text-lg font-semibold text-foreground mb-2">
-                            {manager.name}
-                          </p>
-                          {manager.bio && (
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {manager.bio}
-                            </p>
-                          )}
-                          {manager.contactInfo && (
-                            <p className="text-sm text-foreground">
-                              {manager.contactInfo}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          Manager details will be shared shortly.
-                        </p>
-                      );
-                    })()}
+                    <p className="text-foreground mb-4">
+                      Welcome to PB Black! Your dedicated insurance manager will contact you shortly.
+                    </p>
                   </div>
                   
                   <div className="mt-6">
@@ -165,13 +133,13 @@ export default function InviteStatusChecker() {
                 </>
               )}
 
-              {status.status === 'pending' && (
+              {status.status === InviteStatus.pending && (
                 <p className="text-sm text-muted-foreground mt-4">
-                  Your application is under review. We'll contact you soon.
+                  Your application is under review. We'll contact you within 48 hours.
                 </p>
               )}
 
-              {status.status === 'rejected' && (
+              {status.status === InviteStatus.rejected && (
                 <p className="text-sm text-muted-foreground mt-4">
                   Unfortunately, we are unable to proceed with your application at this time.
                 </p>
@@ -181,10 +149,10 @@ export default function InviteStatusChecker() {
             <div className="bg-card border border-border rounded-lg p-8 text-center">
               <XCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2 text-foreground">
-                No Request Found
+                No Application Found
               </h3>
               <p className="text-muted-foreground">
-                We couldn't find an invitation request for this email address.
+                We couldn't find an application for this email address.
               </p>
             </div>
           )}

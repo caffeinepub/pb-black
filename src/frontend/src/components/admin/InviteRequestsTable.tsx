@@ -1,154 +1,194 @@
 import { useState } from 'react';
-import { useGetAllInviteRequests, useApproveInvite, useRejectInvite } from '../../hooks/useQueries';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useGetAllQualifications, useUpdateQualificationStatus } from '../../hooks/useQueries';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react';
-import type { InviteRequest } from '../../backend';
+import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { InviteStatus, type PremiumQualification } from '../../backend';
 
 export default function InviteRequestsTable() {
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
-  const { data: requests, isLoading } = useGetAllInviteRequests();
-  const approveMutation = useApproveInvite();
-  const rejectMutation = useRejectInvite();
+  const { data: qualifications, isLoading } = useGetAllQualifications();
+  const updateStatus = useUpdateQualificationStatus();
+  const [expandedRow, setExpandedRow] = useState<bigint | null>(null);
 
-  const filteredRequests = requests?.filter(req => {
-    if (statusFilter === 'all') return true;
-    return req.status === statusFilter;
-  }) || [];
-
-  const handleApprove = async (requestId: bigint) => {
+  const handleStatusUpdate = async (qualificationId: bigint, status: InviteStatus) => {
     try {
-      await approveMutation.mutateAsync(requestId);
-    } catch (error: any) {
-      alert(error.message || 'Failed to approve request');
+      await updateStatus.mutateAsync({ qualificationId, status });
+    } catch (error) {
+      console.error('Failed to update status:', error);
     }
   };
 
-  const handleReject = async (requestId: bigint) => {
-    if (!confirm('Are you sure you want to reject this request?')) return;
-    try {
-      await rejectMutation.mutateAsync(requestId);
-    } catch (error: any) {
-      alert(error.message || 'Failed to reject request');
-    }
-  };
-
-  const getStatusBadge = (status: InviteRequest['status']) => {
+  const getStatusBadge = (status: InviteStatus) => {
     switch (status) {
-      case 'approved':
+      case InviteStatus.approved:
         return <Badge className="bg-gold/20 text-gold border-gold/30">Approved</Badge>;
-      case 'rejected':
+      case InviteStatus.rejected:
         return <Badge variant="destructive">Rejected</Badge>;
-      case 'pending':
-        return <Badge variant="outline">Pending</Badge>;
+      default:
+        return <Badge variant="secondary">Pending</Badge>;
     }
+  };
+
+  const formatPremiumRange = (range: string) => {
+    const rangeMap: Record<string, string> = {
+      range25kTo50k: '₹25k-50k',
+      range50kTo75k: '₹50k-75k',
+      range75kTo100k: '₹75k-100k',
+      range100kPlus: '₹100k+'
+    };
+    return rangeMap[range] || range;
+  };
+
+  const formatOccupation = (occupation: string) => {
+    const occupationMap: Record<string, string> = {
+      ceoOrExecutive: 'CEO/Executive',
+      partnerOrDirector: 'Partner/Director',
+      entrepreneurBusinessOwner: 'Entrepreneur',
+      medicalProfessional: 'Medical',
+      lawProfessional: 'Law',
+      pilot: 'Pilot',
+      corporateProfessional: 'Corporate',
+      notListed: 'Other'
+    };
+    return occupationMap[occupation] || occupation;
+  };
+
+  const formatCallTime = (time: string) => {
+    const timeMap: Record<string, string> = {
+      morning: 'Morning',
+      afternoon: 'Afternoon',
+      evening: 'Evening'
+    };
+    return timeMap[time] || time;
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 text-gold animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-gold" />
+      </div>
+    );
+  }
+
+  if (!qualifications || qualifications.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No qualification applications yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-serif font-bold gold-text">
-          Invite Requests
-        </h2>
-        <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Requests</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="bg-card border border-border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>LinkedIn</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRequests.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  No requests found
+    <div className="border border-border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-card/50">
+            <TableHead className="w-12"></TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {qualifications.map((qualification: PremiumQualification) => (
+            <>
+              <TableRow key={qualification.id.toString()} className="hover:bg-card/30">
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedRow(expandedRow === qualification.id ? null : qualification.id)}
+                  >
+                    {expandedRow === qualification.id ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </Button>
+                </TableCell>
+                <TableCell className="font-medium">{qualification.name}</TableCell>
+                <TableCell>{qualification.email}</TableCell>
+                <TableCell>{qualification.phone}</TableCell>
+                <TableCell>{getStatusBadge(qualification.status)}</TableCell>
+                <TableCell>
+                  {new Date(Number(qualification.timestamp / BigInt(1000000))).toLocaleDateString()}
+                </TableCell>
+                <TableCell className="text-right space-x-2">
+                  {qualification.status === InviteStatus.pending && (
+                    <>
+                      <Button
+                        size="sm"
+                        className="bg-gold/20 text-gold hover:bg-gold/30 border-gold/30"
+                        onClick={() => handleStatusUpdate(qualification.id, InviteStatus.approved)}
+                        disabled={updateStatus.isPending}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleStatusUpdate(qualification.id, InviteStatus.rejected)}
+                        disabled={updateStatus.isPending}
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
-            ) : (
-              filteredRequests.map((request) => (
-                <TableRow key={request.requestId.toString()}>
-                  <TableCell className="font-medium">{request.name}</TableCell>
-                  <TableCell>{request.email}</TableCell>
-                  <TableCell>{request.phone}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">
-                    <a
-                      href={request.linkedin.startsWith('http') ? request.linkedin : `https://linkedin.com/in/${request.linkedin}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gold hover:underline"
-                    >
-                      {request.linkedin}
-                    </a>
-                  </TableCell>
-                  <TableCell className="max-w-[150px] truncate">
-                    {request.source || '-'}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(request.status)}</TableCell>
-                  <TableCell>
-                    {request.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleApprove(request.requestId)}
-                          disabled={approveMutation.isPending}
-                          className="gold-gradient text-black"
-                        >
-                          {approveMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <CheckCircle2 className="w-4 h-4" />
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleReject(request.requestId)}
-                          disabled={rejectMutation.isPending}
-                        >
-                          {rejectMutation.isPending ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <XCircle className="w-4 h-4" />
-                          )}
-                        </Button>
+              {expandedRow === qualification.id && (
+                <TableRow className="bg-card/20">
+                  <TableCell colSpan={7}>
+                    <div className="p-4 space-y-3">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">LinkedIn</p>
+                          <p className="text-sm text-foreground break-all">{qualification.linkedin}</p>
+                        </div>
+                        {qualification.totalHealthCover && (
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">Health Cover</p>
+                            <p className="text-sm text-foreground">₹{qualification.totalHealthCover.toString()}</p>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Annual Premium</p>
+                          <p className="text-sm text-foreground">{formatPremiumRange(qualification.annualPremiumRange)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Occupation</p>
+                          <p className="text-sm text-foreground">{formatOccupation(qualification.occupation)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Preferred Call Time</p>
+                          <p className="text-sm text-foreground">{formatCallTime(qualification.preferredCallTime)}</p>
+                        </div>
+                        {qualification.referredBy && (
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">Referred By</p>
+                            <p className="text-sm text-foreground">{qualification.referredBy}</p>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              )}
+            </>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

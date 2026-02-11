@@ -1,77 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --radius: 0.25rem;
-        /* Black background with gold accents */
-        --background: 0.15 0 0;
-        --foreground: 0.95 0 0;
-        --card: 0.18 0 0;
-        --card-foreground: 0.95 0 0;
-        --popover: 0.18 0 0;
-        --popover-foreground: 0.95 0 0;
-        /* Gold primary color */
-        --primary: 0.75 0.15 85;
-        --primary-foreground: 0.15 0 0;
-        --secondary: 0.25 0 0;
-        --secondary-foreground: 0.95 0 0;
-        --muted: 0.25 0 0;
-        --muted-foreground: 0.65 0 0;
-        --accent: 0.75 0.15 85;
-        --accent-foreground: 0.15 0 0;
-        --destructive: 0.55 0.25 25;
-        --destructive-foreground: 0.95 0 0;
-        --border: 0.30 0.08 85 / 30%;
-        --input: 0.30 0.08 85 / 30%;
-        --ring: 0.75 0.15 85;
-        --chart-1: 0.75 0.15 85;
-        --chart-2: 0.65 0.12 75;
-        --chart-3: 0.55 0.10 65;
-        --chart-4: 0.45 0.08 55;
-        --chart-5: 0.35 0.06 45;
-    }
+  :root {
+    /* Black and gold premium theme - HSL channel values */
+    --background: 240 8% 12%;
+    --foreground: 240 5% 95%;
+    --card: 240 8% 15%;
+    --card-foreground: 240 5% 95%;
+    --popover: 240 8% 15%;
+    --popover-foreground: 240 5% 95%;
+    --primary: 45 90% 60%;
+    --primary-foreground: 240 8% 12%;
+    --secondary: 240 8% 25%;
+    --secondary-foreground: 240 5% 95%;
+    --muted: 240 8% 25%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 45 90% 60%;
+    --accent-foreground: 240 8% 12%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 240 5% 98%;
+    --border: 240 8% 25%;
+    --input: 240 8% 25%;
+    --ring: 45 90% 60%;
+    --gold: 45 90% 60%;
+    --gold-light: 45 85% 75%;
+    --gold-dark: 45 95% 50%;
+    --radius: 0.5rem;
+  }
 
-    .dark {
-        --background: 0.10 0 0;
-        --foreground: 0.95 0 0;
-        --card: 0.15 0 0;
-        --card-foreground: 0.95 0 0;
-        --popover: 0.15 0 0;
-        --popover-foreground: 0.95 0 0;
-        --primary: 0.75 0.15 85;
-        --primary-foreground: 0.10 0 0;
-        --secondary: 0.20 0 0;
-        --secondary-foreground: 0.95 0 0;
-        --muted: 0.20 0 0;
-        --muted-foreground: 0.60 0 0;
-        --accent: 0.75 0.15 85;
-        --accent-foreground: 0.10 0 0;
-        --destructive: 0.55 0.25 25;
-        --destructive-foreground: 0.95 0 0;
-        --border: 0.30 0.08 85 / 25%;
-        --input: 0.30 0.08 85 / 25%;
-        --ring: 0.75 0.15 85;
-    }
-
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+  .dark {
+    /* Same values for dark mode to maintain consistency */
+    --background: 240 8% 12%;
+    --foreground: 240 5% 95%;
+    --card: 240 8% 15%;
+    --card-foreground: 240 5% 95%;
+    --popover: 240 8% 15%;
+    --popover-foreground: 240 5% 95%;
+    --primary: 45 90% 60%;
+    --primary-foreground: 240 8% 12%;
+    --secondary: 240 8% 25%;
+    --secondary-foreground: 240 5% 95%;
+    --muted: 240 8% 25%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 45 90% 60%;
+    --accent-foreground: 240 8% 12%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 240 5% 98%;
+    --border: 240 8% 25%;
+    --input: 240 8% 25%;
+    --ring: 45 90% 60%;
+    --gold: 45 90% 60%;
+    --gold-light: 45 85% 75%;
+    --gold-dark: 45 95% 50%;
+  }
 }
 
-@layer components {
-    .gold-gradient {
-        background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.65 0.12 75) 100%);
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .gold-text {
+    background: linear-gradient(to right, hsl(45 85% 75%), hsl(45 90% 60%), hsl(45 95% 50%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(to right, hsl(45 85% 75%), hsl(45 90% 60%), hsl(45 95% 50%));
+  }
+
+  .shadow-gold {
+    box-shadow: 0 4px 20px -2px hsl(45 90% 60% / 0.3);
+  }
+
+  .shadow-gold-lg {
+    box-shadow: 0 10px 40px -5px hsl(45 90% 60% / 0.4);
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 1s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
     }
-    
-    .gold-text {
-        background: linear-gradient(135deg, oklch(0.75 0.15 85) 0%, oklch(0.65 0.12 75) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 }
